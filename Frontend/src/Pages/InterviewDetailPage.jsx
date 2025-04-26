@@ -1,27 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios'; // Import axios
 import '../styles/InterviewDetailPage.css';
 
 const InterviewDetailPage = () => {
   const navigate = useNavigate();
   
-  // Form state
   const [domain, setDomain] = useState('');
   const [techStacks, setTechStacks] = useState([]);
   const [interviewType, setInterviewType] = useState('audio');
   const [interviewer, setInterviewer] = useState('john');
   const [questionCount, setQuestionCount] = useState(5);
   const [formError, setFormError] = useState('');
+
+  const [availableDomains, setAvailableDomains] = useState([]); // New: fetched domains
+  const [loadingDomains, setLoadingDomains] = useState(true);    // New: loading state
   
-  // Domain-specific tech stacks
-  const techStackOptions = {
-    'web-dev': ['React', 'Angular', 'Vue', 'Node.js', 'Express', 'MongoDB', 'GraphQL'],
-    'data-science': ['Python', 'R', 'Pandas', 'NumPy', 'TensorFlow', 'PyTorch', 'SQL'],
-    'mobile-dev': ['React Native', 'Flutter', 'iOS/Swift', 'Android/Kotlin', 'Xamarin'],
-    'devops': ['Docker', 'Kubernetes', 'AWS', 'CI/CD', 'Jenkins', 'Terraform'],
-    'cyber-security': ['Network Security', 'Penetration Testing', 'Security Auditing', 'Cryptography']
-  };
-  
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+
+  useEffect(() => {
+    const fetchDomains = async () => {
+      try {
+        const res = await axios.get(`${backendUrl}/domain/`);
+        setAvailableDomains(res.data); // Save the fetched domains
+      } catch (error) {
+        console.error('Error fetching domains:', error);
+      } finally {
+        setLoadingDomains(false);
+      }
+    };
+    fetchDomains();
+  }, [backendUrl]);
+
   const handleTechStackChange = (tech) => {
     if (techStacks.includes(tech)) {
       setTechStacks(techStacks.filter(item => item !== tech));
@@ -29,22 +40,20 @@ const InterviewDetailPage = () => {
       setTechStacks([...techStacks, tech]);
     }
   };
-  
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    // Validate form
+
     if (!domain) {
       setFormError('Please select a domain');
       return;
     }
-    
+
     if (techStacks.length === 0) {
       setFormError('Please select at least one tech stack');
       return;
     }
-    
-    // Prepare interview details
+
     const interviewDetails = {
       domain,
       techStacks,
@@ -52,8 +61,7 @@ const InterviewDetailPage = () => {
       interviewer,
       questionCount
     };
-    
-    // Navigate to interview session with interview details
+
     navigate('/interview-session', { state: { interviewDetails } });
   };
 
@@ -64,36 +72,41 @@ const InterviewDetailPage = () => {
         <p className="form-subtitle">
           Set up your mock interview by selecting your domain, technologies, and preferences.
         </p>
-        
+
         {formError && <div className="error-message">{formError}</div>}
-        
+
         <form className="interview-form" onSubmit={handleSubmit}>
+
           {/* Domain Selection */}
           <div className="form-group">
             <label className="form-label">Select Domain</label>
-            <select 
-              className="form-select" 
-              value={domain} 
-              onChange={(e) => {
-                setDomain(e.target.value);
-                setTechStacks([]);
-              }}
-            >
-              <option value="">-- Select Domain --</option>
-              <option value="web-dev">Web Development</option>
-              <option value="data-science">Data Science</option>
-              <option value="mobile-dev">Mobile Development</option>
-              <option value="devops">DevOps</option>
-              <option value="cyber-security">Cyber Security</option>
-            </select>
+            {loadingDomains ? (
+              <p>Loading domains...</p>
+            ) : (
+              <select 
+                className="form-select" 
+                value={domain} 
+                onChange={(e) => {
+                  setDomain(e.target.value);
+                  setTechStacks([]);
+                }}
+              >
+                <option value="">-- Select Domain --</option>
+                {availableDomains.map(d => (
+                  <option key={d.domain} value={d.domain}>
+                    {d.domain}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
-          
+
           {/* Tech Stack Selection */}
-          {domain && (
+          {domain && availableDomains.find(d => d.domain === domain) && (
             <div className="form-group">
               <label className="form-label">Select Tech Stacks</label>
               <div className="tech-stack-tabs">
-                {techStackOptions[domain].map(tech => (
+                {availableDomains.find(d => d.domain === domain)?.techStacks.map(tech => (
                   <button
                     key={tech}
                     type="button"
@@ -111,8 +124,8 @@ const InterviewDetailPage = () => {
               </div>
             </div>
           )}
-          
-          {/* Interview Type Tabs */}
+
+          {/* Interview Type, Interviewer, Question Count as before */}
           <div className="form-group">
             <label className="form-label">Interview Type</label>
             <div className="tab-group">
@@ -132,8 +145,7 @@ const InterviewDetailPage = () => {
               </button>
             </div>
           </div>
-          
-          {/* Interviewer Selection Tabs */}
+
           <div className="form-group">
             <label className="form-label">Choose Interviewer</label>
             <div className="interviewer-tabs">
@@ -155,8 +167,7 @@ const InterviewDetailPage = () => {
               </button>
             </div>
           </div>
-          
-          {/* Number of Questions Tabs */}
+
           <div className="form-group">
             <label className="form-label">Number of Questions</label>
             <div className="question-count-tabs">
@@ -183,7 +194,7 @@ const InterviewDetailPage = () => {
               </button>
             </div>
           </div>
-          
+
           <button type="submit" className="btn btn-primary start-interview-btn">
             Start Interview
           </button>

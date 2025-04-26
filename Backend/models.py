@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any,List
 from pydantic import BaseModel, EmailStr, Field, validator
 from bson import ObjectId
 from enum import Enum
@@ -64,3 +64,7 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     id: Optional[str] = None
+
+class Domain(BaseModel):
+    domain: str
+    techStacks: List[str]

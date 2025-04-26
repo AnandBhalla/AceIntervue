@@ -19,7 +19,7 @@ const InterviewSessionPage = () => {
   const questions = [
     "Tell me about your experience in this field.",
     "How do you handle challenging situations in your work?",
-    `Can you explain your experience with ${interviewDetails?.techStack[0] || 'relevant technologies'}?`,
+    // `Can you explain your experience with ${interviewDetails?.techStack[0] || 'relevant technologies'}?`,
     "Describe a project you worked on that you're particularly proud of.",
     "How do you stay updated with the latest developments in your field?",
     "What are your strengths and weaknesses related to this role?",
