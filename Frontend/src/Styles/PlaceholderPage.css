@@ -1,0 +1,30 @@
+
+.placeholder-page {
+  min-height: calc(100vh - 160px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.placeholder-page h1 {
+  color: var(--primary-blue);
+  margin-bottom: 20px;
+}
+
+.placeholder-description {
+  max-width: 600px;
+  margin: 0 auto 30px;
+  font-size: 1.2rem;
+  color: var(--text-gray);
+}
+
+.coming-soon-label {
+  display: inline-block;
+  background-color: var(--primary-blue);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-weight: 500;
+}

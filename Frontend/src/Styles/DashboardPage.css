@@ -1,0 +1,238 @@
+
+.dashboard-page {
+  padding: 40px 0 60px;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+  color: var(--primary-blue);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.dashboard-card {
+  background-color: var(--white);
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  overflow: hidden;
+}
+
+.dashboard-card h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: var(--primary-blue);
+  font-size: 1.2rem;
+  position: relative;
+}
+
+.dashboard-card h2::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background-color: var(--primary-blue);
+}
+
+/* Summary Card */
+.summary-stats {
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-blue);
+  line-height: 1;
+  margin-bottom: 5px;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: var(--text-gray);
+}
+
+/* Progress Card */
+.progress-chart {
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-placeholder {
+  color: var(--medium-gray);
+  text-align: center;
+  font-style: italic;
+}
+
+/* Interviews Card */
+.interviews-card {
+  margin-bottom: 20px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.interviews-table-container {
+  overflow-x: auto;
+}
+
+.interviews-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.interviews-table th,
+.interviews-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--light-gray);
+}
+
+.interviews-table th {
+  background-color: #f8f8f8;
+  font-weight: 600;
+}
+
+.interviews-table tr:last-child td {
+  border-bottom: none;
+}
+
+.interviews-table tr:hover {
+  background-color: rgba(30, 174, 219, 0.05);
+}
+
+.tech-stack-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.tech-tag {
+  background-color: #e9f7fb;
+  color: var(--primary-blue);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.score-badge {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 15px;
+  color: var(--white);
+  font-weight: 500;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+}
+
+/* Recommendations Card */
+.recommendations-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.recommendations-list li {
+  padding: 15px;
+  background-color: #f8f8f8;
+  border-radius: 6px;
+  border-left: 3px solid var(--primary-blue);
+}
+
+.recommendation-title {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: var(--text-gray);
+}
+
+.recommendation-desc {
+  color: var(--medium-gray);
+  font-size: 0.9rem;
+}
+
+/* Upcoming Features Card */
+.upcoming-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.upcoming-list li {
+  display: flex;
+  gap: 15px;
+  padding: 10px 0;
+}
+
+.upcoming-icon {
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upcoming-title {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: var(--text-gray);
+}
+
+.upcoming-desc {
+  color: var(--medium-gray);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hide-mobile {
+    display: none;
+  }
+}
