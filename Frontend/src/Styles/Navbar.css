@@ -128,10 +128,24 @@
   z-index: 1000;
 }
 
-.dropdown:active .dropdown-menu {
+/* Show the dropdown when the parent div is hovered */
+.nav-auth .dropdown:hover .dropdown-menu {
   display: block;
 }
 
+/* Ensure the dropdown menu stays visible even when hovered directly */
+.dropdown-menu {
+  display: none; /* Initially hidden */
+  position: absolute;
+  top: 100%; /* Position the dropdown below the button */
+  left: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  z-index: 1000;
+}
+
+/* Style the dropdown items */
 .dropdown-item {
   display: block;
   padding: 10px 15px;
@@ -144,9 +158,15 @@
   cursor: pointer;
 }
 
+/* Add hover effect to the items */
 .dropdown-item:hover {
   background-color: var(--light-gray);
   color: var(--primary-blue);
+}
+
+/* Optional: Add a hover effect for the dropdown to stay open if hovering over it */
+.dropdown-menu:hover {
+  display: block;
 }
 
 @media screen and (max-width: 960px) {

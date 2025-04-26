@@ -4,7 +4,6 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from bson import ObjectId
 from datetime import datetime
 from jose import JWTError, jwt
-
 from database import get_db
 from config import settings
 import models
