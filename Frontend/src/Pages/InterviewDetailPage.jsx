@@ -181,7 +181,8 @@ const InterviewDetailPage = () => {
               <button
                 type="button"
                 className={`count-tab ${questionCount === 5 ? 'active' : ''}`}
-                onClick={() => setQuestionCount(5)}
+                onClick={() => setQuestionCount(5)
+                }
               >
                 5 Questions (25 mins)
               </button>

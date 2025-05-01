@@ -47,13 +47,13 @@ const Navbar = ({ isLoggedIn, onLogout }) => {
               CV
             </Link>
           </li>
-          {isLoggedIn && (
+          {/* {isLoggedIn && (
             <li className="nav-item">
               <Link to="/dashboard" className="nav-link" onClick={() => setIsMenuOpen(false)}>
                 Dashboard
               </Link>
             </li>
-          )}
+          )} */}
         </ul>
         
         <div className="nav-auth">
@@ -63,7 +63,7 @@ const Navbar = ({ isLoggedIn, onLogout }) => {
                 <User size={20} />
               </button>
               <div className="dropdown-menu">
-                <Link to="/profile" className="dropdown-item">Profile</Link>
+                <Link to="/dashboard" className="dropdown-item">Profile</Link>
                 <button onClick={onLogout} className="dropdown-item">Logout</button>
               </div>
             </div>
