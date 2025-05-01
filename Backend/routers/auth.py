@@ -103,9 +103,15 @@ async def login(
         )
     
     # Create access token
-    access_token = create_access_token(data={"user_id": str(user["_id"])})
+    user_id = str(user["_id"])
+    # print(user_id)
+    access_token = create_access_token(data={"user_id": user_id})
     
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {
+        "access_token": access_token, 
+        "token_type": "bearer",
+        "user_id": user_id,
+    }
 
 @router.get("/verify-email")
 async def verify_email(token: str, db: AsyncIOMotorDatabase = Depends(get_db)):

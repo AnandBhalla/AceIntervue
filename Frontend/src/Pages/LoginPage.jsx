@@ -22,6 +22,8 @@ const LoginPage = () => {
   
       if (res && res.status === 200) {
         localStorage.setItem('token', res.data.access_token);
+        localStorage.setItem('user', res.data.user_id);
+        // console.log(res.data.user_id);
         navigate('/dashboard');
       } else {
         setError('Login failed! Please check your credentials.');

@@ -61,6 +61,7 @@ class UserOut(UserBase):
 class Token(BaseModel):
     access_token: str
     token_type: str
+    user_id: str
 
 class TokenData(BaseModel):
     id: Optional[str] = None
@@ -68,3 +69,25 @@ class TokenData(BaseModel):
 class Domain(BaseModel):
     domain: str
     techStacks: List[str]
+
+class QnARequest(BaseModel):
+    domain: str  # Interview domain (e.g., frontend, backend, etc.)
+    techStack: List[str]  # List of technologies used (e.g., ["React", "Node.js"])
+    questionCount: int  # Number of questions to generate
+    interviewMode: str 
+    user:str
+
+class QnAResponse(BaseModel):
+    questions: List[str]
+    answers: List[str]
+
+class Interview(BaseModel):
+    userid: str
+    questions: List[str]
+    answers: List[str]
+    candanswers: List[str]
+    result: Optional[Dict] = {}
+
+@property
+def question_count(self) -> int:
+    return self.questionCount
