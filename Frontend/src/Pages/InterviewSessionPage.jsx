@@ -19,7 +19,8 @@ const InterviewSessionPage = () => {
   const [AiSpeaking, setAiSpeaking] = useState(false);
   const [CandSpeaking, setCandSpeaking] = useState(false);
   const [loading, setLoading] = useState(true);
-  
+  if (loading) return <Loader/>;
+
   const recognitionRef = useRef(null);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const user = localStorage.getItem('user');
@@ -68,16 +69,18 @@ const InterviewSessionPage = () => {
   };
 
   const submitInterview = async () => {
+    console.log(candidateAnswers)
     setLoading(true);
     const response = await fetch(`${backendUrl}/evaluate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         questions,
-        modelAnswers: answers,
+        answers,
         candidateAnswers,
         domain,
-        tech_stack: techStack
+        techStack,
+        user
       }),
     });
 
@@ -150,7 +153,6 @@ const InterviewSessionPage = () => {
       : `https://example.com/${base}-listening.mp4`;
   };
 
-  if (loading) return <Loader />;
   if (error) return <div className="interview-session-page">Error: {error}</div>;
   if (!interviewDetails) return <div className="interview-session-page">No interview details found</div>;
 

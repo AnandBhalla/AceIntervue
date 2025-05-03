@@ -1,33 +1,26 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from database import get_db
 from utils import evaluate
-from utils.auth import get_current_user
-from bson import ObjectId
+from models import EvaluateReq, EvaluateRes
 
 router = APIRouter(tags=["Evaluation"])
 
-@router.post("/", response_model=dict)
+@router.post("/", response_model=EvaluateRes)
 async def evaluate_candidate(
-    data: dict,
+    data: EvaluateReq,
     db: AsyncIOMotorDatabase = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
 ):
-    # Evaluate answers
-    result = await evaluate(data)
+    result = await evaluate(data.dict())
 
-    # Update latest interview document for the user
-    update_result = await db.interviews.find_one_and_update(
-        {"userid": str(current_user["_id"])},
-        {"$set": {
-            "candanswers": data.get("candidateAnswers", []),
-            "result": result
-        }},
-        sort=[("_id", -1)],  # Most recent interview
-        return_document=True
-    )
+    await db.interviews.insert_one({
+        "questions": data.questions,
+        "answers": data.answers,
+        "candanswers": data.candidateAnswers,
+        "techStack": data.techStack,
+        "domain": data.domain,
+        "user": data.user,
+        "result": result
+    })
 
-    if not update_result:
-        raise HTTPException(status_code=404, detail="Interview not found for the user")
-
-    return {"message": "Evaluation completed and saved", "result": result}
+    return {"results": result}
