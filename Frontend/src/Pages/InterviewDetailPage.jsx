@@ -1,29 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios'; // Import axios
+import axios from 'axios';
 import '../styles/InterviewDetailPage.css';
+import john from '../assets/john.jpeg';
+import jane from '../assets/jane.jpeg';
 
 const InterviewDetailPage = () => {
   const navigate = useNavigate();
   
   const [domain, setDomain] = useState('');
   const [techStacks, setTechStacks] = useState([]);
-  const [interviewType, setInterviewType] = useState('audio');
+  const [interviewMode, setInterviewMode] = useState('audio'); // changed mode to interviewMode
+  const [interviewType, setInterviewType] = useState('qna'); // changed type to interviewType
   const [interviewer, setInterviewer] = useState('john');
   const [questionCount, setQuestionCount] = useState(5);
-  const [formError, setFormError] = useState('');
+  const [error, setError] = useState('');
 
-  const [availableDomains, setAvailableDomains] = useState([]); // New: fetched domains
-  const [loadingDomains, setLoadingDomains] = useState(true);    // New: loading state
+  const [availableDomains, setAvailableDomains] = useState([]);
+  const [loadingDomains, setLoadingDomains] = useState(true);
   
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-
 
   useEffect(() => {
     const fetchDomains = async () => {
       try {
         const res = await axios.get(`${backendUrl}/domain/`);
-        setAvailableDomains(res.data); // Save the fetched domains
+        setAvailableDomains(res.data);
       } catch (error) {
         console.error('Error fetching domains:', error);
       } finally {
@@ -45,19 +47,20 @@ const InterviewDetailPage = () => {
     e.preventDefault();
 
     if (!domain) {
-      setFormError('Please select a domain');
+      setError('Please select a domain');
       return;
     }
 
     if (techStacks.length === 0) {
-      setFormError('Please select at least one tech stack');
+      setError('Please select at least one tech stack');
       return;
     }
 
     const interviewDetails = {
       domain,
       techStacks,
-      interviewType,
+      interviewMode,  // changed from mode to interviewMode
+      interviewType,  // changed from type to interviewType
       interviewer,
       questionCount
     };
@@ -68,12 +71,12 @@ const InterviewDetailPage = () => {
   return (
     <div className="interview-detail-page">
       <div className="interview-form-container">
-        <h1>Configure Your Interview</h1>
+        <h1>Interview Details</h1>
         <p className="form-subtitle">
           Set up your mock interview by selecting your domain, technologies, and preferences.
         </p>
 
-        {formError && <div className="error-message">{formError}</div>}
+        {error && <div className="error-message">{error}</div>} {/* updated formError to error */}
 
         <form className="interview-form" onSubmit={handleSubmit}>
 
@@ -88,10 +91,10 @@ const InterviewDetailPage = () => {
                 value={domain} 
                 onChange={(e) => {
                   setDomain(e.target.value);
-                  setTechStacks([]);
+                  setTechStacks([]); // Reset tech stacks when domain changes
                 }}
               >
-                <option value="">-- Select Domain --</option>
+                <option value="">Select Domain</option>
                 {availableDomains.map(d => (
                   <option key={d.domain} value={d.domain}>
                     {d.domain}
@@ -125,49 +128,79 @@ const InterviewDetailPage = () => {
             </div>
           )}
 
-          {/* Interview Type, Interviewer, Question Count as before */}
+          {/* Mode Selection (Audio/Video) */}
           <div className="form-group">
-            <label className="form-label">Interview Type</label>
+            <label className="form-label">Mode</label>
             <div className="tab-group">
               <button 
                 type="button"
-                className={`tab-button ${interviewType === 'audio' ? 'active' : ''}`}
-                onClick={() => setInterviewType('audio')}
+                className={`tab-button ${interviewMode === 'audio' ? 'active' : ''}`}
+                onClick={() => setInterviewMode('audio')}
               >
                 Audio
               </button>
               <button 
                 type="button"
-                className={`tab-button ${interviewType === 'video' ? 'active' : ''}`}
-                onClick={() => setInterviewType('video')}
+                className={`tab-button ${interviewMode === 'video' ? 'active' : ''}`}
+                onClick={() => setInterviewMode('video')}
               >
                 Video
               </button>
             </div>
           </div>
 
+          {/* Type Selection (Coding, Q&A, HR) */}
           <div className="form-group">
-            <label className="form-label">Choose Interviewer</label>
-            <div className="interviewer-tabs">
-              <button
+            <label className="form-label">Type</label>
+            <div className="tab-group">
+              <button 
                 type="button"
-                className={`interviewer-tab ${interviewer === 'john' ? 'active' : ''}`}
-                onClick={() => setInterviewer('john')}
+                className={`tab-button ${interviewType === 'coding' ? 'active' : ''}`}
+                onClick={() => setInterviewType('coding')}
               >
-                <div className="interviewer-avatar john"></div>
-                <span>John Doe (Male)</span>
+                Coding
               </button>
-              <button
+              <button 
                 type="button"
-                className={`interviewer-tab ${interviewer === 'jane' ? 'active' : ''}`}
-                onClick={() => setInterviewer('jane')}
+                className={`tab-button ${interviewType === 'qna' ? 'active' : ''}`}
+                onClick={() => setInterviewType('qna')}
               >
-                <div className="interviewer-avatar jane"></div>
-                <span>Jane Doe (Female)</span>
+                Q&A
+              </button>
+              <button 
+                type="button"
+                className={`tab-button ${interviewType === 'hr' ? 'active' : ''}`}
+                onClick={() => setInterviewType('hr')}
+              >
+                HR
               </button>
             </div>
           </div>
 
+          {/* Interviewer Selection */}
+<div className="form-group">
+  <label className="form-label">Choose Interviewer</label>
+  <div className="interviewer-tabs">
+    <button
+      type="button"
+      className={`interviewer-tab ${interviewer === 'john' ? 'active' : ''}`}
+      onClick={() => setInterviewer('john')}
+    >
+      <img src={john} alt="John Doe" className="interviewer-avatar" />
+      <span>John Doe (Male)</span>
+    </button>
+    <button
+      type="button"
+      className={`interviewer-tab ${interviewer === 'jane' ? 'active' : ''}`}
+      onClick={() => setInterviewer('jane')}
+    >
+      <img src={jane} alt="Jane Doe" className="interviewer-avatar" />
+      <span>Jane Doe (Female)</span>
+    </button>
+  </div>
+</div>
+
+          {/* Question Count Selection */}
           <div className="form-group">
             <label className="form-label">Number of Questions</label>
             <div className="question-count-tabs">
@@ -181,8 +214,7 @@ const InterviewDetailPage = () => {
               <button
                 type="button"
                 className={`count-tab ${questionCount === 5 ? 'active' : ''}`}
-                onClick={() => setQuestionCount(5)
-                }
+                onClick={() => setQuestionCount(5)}
               >
                 5 Questions (25 mins)
               </button>

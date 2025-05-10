@@ -13,7 +13,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 40px;
+  gap: 100px;
 }
 
 .hero-content {
@@ -44,9 +44,11 @@
 }
 
 .hero-image img {
+  border: none;
   max-width: 100%;
-  border-radius: 8px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  /* margin-left: 100px; */
+  /* border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); */
 }
 
 /* Section Titles */

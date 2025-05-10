@@ -42,11 +42,11 @@ const Navbar = ({ isLoggedIn, onLogout }) => {
               Resume
             </Link>
           </li>
-          <li className="nav-item">
+          {/* <li className="nav-item">
             <Link to="/cv" className="nav-link" onClick={() => setIsMenuOpen(false)}>
               CV
             </Link>
-          </li>
+          </li> */}
           {/* {isLoggedIn && (
             <li className="nav-item">
               <Link to="/dashboard" className="nav-link" onClick={() => setIsMenuOpen(false)}>
@@ -70,7 +70,7 @@ const Navbar = ({ isLoggedIn, onLogout }) => {
           ) : (
             <div className="auth-buttons">
               <Link to="/login" className="btn btn-outline btn-sm">Login</Link>
-              <Link to="/signup" className="btn btn-sm">Sign Up</Link>
+              <Link to="/signup" className="btn btn-sm btn-outline">Sign Up</Link>
             </div>
           )}
         </div>

@@ -1,6 +1,6 @@
-
 import React from 'react';
 import '../Styles/HomePage.css';
+import home from '../assets/home.png'
 
 const HomePage = () => {
   return (
@@ -12,12 +12,12 @@ const HomePage = () => {
             <p>Get personalized interview preparation and feedback to land your dream job</p>
             <div className="hero-buttons">
               <a href="/interview"><button className="btn" >Start Practicing Now</button></a>
+              <a href="#learn"><button className="btn btn-outline">Learn More</button></a>
               
-              <button className="btn btn-outline">Learn More</button>
             </div>
           </div>
           <div className="hero-image">
-            <img src="https://images.unsplash.com/photo-1551038247-3d9af20df552?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzMzc0NjN8MHwxfHNlYXJjaHwzfHxibHVlJTIwYnVzaW5lc3N8ZW58MHx8fHwxNzEzMjY4NDg3fDA&ixlib=rb-4.0.3&q=80&w=400" alt="AI Interview" />
+            <img src={home} alt="" />
           </div>
         </div>
       </section>
@@ -47,7 +47,7 @@ const HomePage = () => {
 
       <section className="how-it-works">
         <div className="container">
-          <h2 className="section-title">How It Works</h2>
+          <h2 className="section-title" id='learn'>How It Works</h2>
           <div className="steps">
             <div className="step">
               <div className="step-number">1</div>

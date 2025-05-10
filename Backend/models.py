@@ -74,8 +74,10 @@ class QnARequest(BaseModel):
     domain: str  # Interview domain (e.g., frontend, backend, etc.)
     techStack: List[str]  # List of technologies used (e.g., ["React", "Node.js"])
     questionCount: int  # Number of questions to generate
-    interviewMode: str 
-    user:str
+    interviewMode: str  # Mode of interview 
+    interviewType: str  
+    interviewerName: str  # Interviewer's gender or identifier
+    user: str  # User's identifier or name
 
 class QnAResponse(BaseModel):
     questions: List[str]
@@ -91,3 +93,14 @@ class Interview(BaseModel):
 @property
 def question_count(self) -> int:
     return self.questionCount
+
+class EvaluateReq(BaseModel):
+    questions: List[str]
+    answers: List[str]
+    candidateAnswers: List[str]
+    techStack: List[str]
+    domain: str
+    user: str
+
+class EvaluateRes(BaseModel):
+    results: Dict[str, Any]

@@ -91,6 +91,10 @@
   font-size: 0.875rem;
 }
 
+.signup-btn:hover{
+  
+}
+
 .menu-icon {
   display: none;
   cursor: pointer;
