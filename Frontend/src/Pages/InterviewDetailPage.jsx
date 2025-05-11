@@ -4,18 +4,18 @@ import axios from 'axios';
 import '../styles/InterviewDetailPage.css';
 import john from '../assets/john.jpeg';
 import jane from '../assets/jane.jpeg';
+import { showToast } from '../utils/toast';
 
 const InterviewDetailPage = () => {
   const navigate = useNavigate();
   
   const [domain, setDomain] = useState('');
   const [techStacks, setTechStacks] = useState([]);
-  const [interviewMode, setInterviewMode] = useState('audio'); // changed mode to interviewMode
-  const [interviewType, setInterviewType] = useState('qna'); // changed type to interviewType
+  const [interviewMode, setInterviewMode] = useState('audio');
+  const [interviewType, setInterviewType] = useState('qna');
   const [interviewer, setInterviewer] = useState('john');
   const [questionCount, setQuestionCount] = useState(5);
-  const [error, setError] = useState('');
-
+  
   const [availableDomains, setAvailableDomains] = useState([]);
   const [loadingDomains, setLoadingDomains] = useState(true);
   
@@ -28,6 +28,7 @@ const InterviewDetailPage = () => {
         setAvailableDomains(res.data);
       } catch (error) {
         console.error('Error fetching domains:', error);
+        showToast('Failed to fetch domains', 'error');
       } finally {
         setLoadingDomains(false);
       }
@@ -47,24 +48,25 @@ const InterviewDetailPage = () => {
     e.preventDefault();
 
     if (!domain) {
-      setError('Please select a domain');
+      showToast('Please select a domain', 'error');
       return;
     }
 
     if (techStacks.length === 0) {
-      setError('Please select at least one tech stack');
+      showToast('Please select at least one tech stack', 'error');
       return;
     }
 
     const interviewDetails = {
       domain,
       techStacks,
-      interviewMode,  // changed from mode to interviewMode
-      interviewType,  // changed from type to interviewType
+      interviewMode,
+      interviewType,
       interviewer,
       questionCount
     };
 
+    showToast('Starting Interview', 'info');
     navigate('/interview-session', { state: { interviewDetails } });
   };
 
@@ -75,8 +77,6 @@ const InterviewDetailPage = () => {
         <p className="form-subtitle">
           Set up your mock interview by selecting your domain, technologies, and preferences.
         </p>
-
-        {error && <div className="error-message">{error}</div>} {/* updated formError to error */}
 
         <form className="interview-form" onSubmit={handleSubmit}>
 
@@ -178,27 +178,27 @@ const InterviewDetailPage = () => {
           </div>
 
           {/* Interviewer Selection */}
-<div className="form-group">
-  <label className="form-label">Choose Interviewer</label>
-  <div className="interviewer-tabs">
-    <button
-      type="button"
-      className={`interviewer-tab ${interviewer === 'john' ? 'active' : ''}`}
-      onClick={() => setInterviewer('john')}
-    >
-      <img src={john} alt="John Doe" className="interviewer-avatar" />
-      <span>John Doe (Male)</span>
-    </button>
-    <button
-      type="button"
-      className={`interviewer-tab ${interviewer === 'jane' ? 'active' : ''}`}
-      onClick={() => setInterviewer('jane')}
-    >
-      <img src={jane} alt="Jane Doe" className="interviewer-avatar" />
-      <span>Jane Doe (Female)</span>
-    </button>
-  </div>
-</div>
+          <div className="form-group">
+            <label className="form-label">Choose Interviewer</label>
+            <div className="interviewer-tabs">
+              <button
+                type="button"
+                className={`interviewer-tab ${interviewer === 'john' ? 'active' : ''}`}
+                onClick={() => setInterviewer('john')}
+              >
+                <img src={john} alt="John Doe" className="interviewer-avatar" />
+                <span>John Doe (Male)</span>
+              </button>
+              <button
+                type="button"
+                className={`interviewer-tab ${interviewer === 'jane' ? 'active' : ''}`}
+                onClick={() => setInterviewer('jane')}
+              >
+                <img src={jane} alt="Jane Doe" className="interviewer-avatar" />
+                <span>Jane Doe (Female)</span>
+              </button>
+            </div>
+          </div>
 
           {/* Question Count Selection */}
           <div className="form-group">
