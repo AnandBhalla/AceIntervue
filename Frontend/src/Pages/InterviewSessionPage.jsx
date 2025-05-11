@@ -19,13 +19,8 @@ const InterviewSessionPage = () => {
   const [aiSpeaking, setAiSpeaking] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [loading, setLoading] = useState(true);
-<<<<<<< HEAD
   const [micPermissionGranted, setMicPermissionGranted] = useState(false);
   const apiCalledRef = useRef(false);
-=======
-  if (loading) return <Loader/>;
-
->>>>>>> f24259810ef05b3e252e900de1ddc2b2ebb41f38
   const recognitionRef = useRef(null);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   
@@ -123,8 +118,7 @@ const InterviewSessionPage = () => {
 
   // Submit interview results for evaluation
   const submitInterview = async () => {
-<<<<<<< HEAD
-    // console.log(candidateAnswers);
+    console.log(candidateAnswers);
     setLoading(true);
     const payload = {
       questions,
@@ -139,27 +133,6 @@ const InterviewSessionPage = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
-=======
-    console.log(candidateAnswers)
-    setLoading(true);
-    const response = await fetch(`${backendUrl}/evaluate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        questions,
-        answers,
-        candidateAnswers,
-        domain,
-        techStack,
-        user
-      }),
-    });
-
-    if (response.ok) {
-      const evaluationData = await response.json();
-      navigate('/results', { 
-        state: { interviewDetails, evaluationReport: evaluationData } 
->>>>>>> f24259810ef05b3e252e900de1ddc2b2ebb41f38
       });
       
       if (response.ok) {
@@ -257,7 +230,6 @@ const InterviewSessionPage = () => {
     const state = aiSpeaking ? 'speaking' : 'listening';
     return `https://example.com/${state}.mp4`;
   };
-<<<<<<< HEAD
   
   // Render error state
   if (error) {
@@ -280,12 +252,6 @@ const InterviewSessionPage = () => {
   }
   
   // Render main interview UI
-=======
-
-  if (error) return <div className="interview-session-page">Error: {error}</div>;
-  if (!interviewDetails) return <div className="interview-session-page">No interview details found</div>;
-
->>>>>>> f24259810ef05b3e252e900de1ddc2b2ebb41f38
   return (
     <div className="interview-session-page">
       <div className="container">
