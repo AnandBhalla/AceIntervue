@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, Dict, Any,List
+from typing import Optional, Dict, Any, List
 from pydantic import BaseModel, EmailStr, Field, validator
 from bson import ObjectId
 from enum import Enum
@@ -94,13 +94,21 @@ class Interview(BaseModel):
 def question_count(self) -> int:
     return self.questionCount
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f24259810ef05b3e252e900de1ddc2b2ebb41f38
 class EvaluateReq(BaseModel):
     questions: List[str]
     answers: List[str]
     candidateAnswers: List[str]
     techStack: List[str]
     domain: str
+<<<<<<< HEAD
     user: str
+=======
+    user:str
+>>>>>>> f24259810ef05b3e252e900de1ddc2b2ebb41f38
 
 class EvaluateRes(BaseModel):
     results: Dict[str, Any]
