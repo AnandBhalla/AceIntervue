@@ -4,6 +4,7 @@ import '../Styles/InterviewSessionPage.css';
 import { speak, cancelSpeech } from '../utils/speechSynthesis';
 import { initializeRecognition } from '../utils/speechRecognition';
 import Loader from "../Components/Loader";
+import { Mic, MicOff } from 'lucide-react';
 
 const InterviewSessionPage = () => {
   const location = useLocation();
@@ -16,8 +17,9 @@ const InterviewSessionPage = () => {
   const [candidateAnswers, setCandidateAnswers] = useState([]);
   const [error, setError] = useState(null);
   const [aiSpeaking, setAiSpeaking] = useState(false);
-  const [candSpeaking, setCandSpeaking] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [micPermissionGranted, setMicPermissionGranted] = useState(false);
   const apiCalledRef = useRef(false);
   const recognitionRef = useRef(null);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -30,64 +32,93 @@ const InterviewSessionPage = () => {
   const interviewType = interviewDetails?.interviewType;
   const interviewMode = interviewDetails?.interviewMode;
   const interviewerName = interviewDetails?.interviewer;
+  // const candidateAnswers=Array(questionCount).fill("");
   
+  // Check microphone permissions
+  const checkMicrophonePermission = async () => {
+    try {
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+      setMicPermissionGranted(true);
+      return true;
+    } catch (err) {
+      setError("Microphone access denied. Please enable microphone permissions.");
+      setMicPermissionGranted(false);
+      return false;
+    }
+  };
+
   // Function to handle speaking by the AI interviewer
   const askQuestion = async (question) => {
     setAiSpeaking(true);
     setSubtitle(`${interviewerName}: ${question}`);
     await speak(question);
     setAiSpeaking(false);
-    await new Promise(resolve => setTimeout(resolve, 500)); // Small pause after speaking
+    await new Promise(resolve => setTimeout(resolve, 500));
   };
   
-  // Function to record candidate's answer
-  const getAnswer = async () => {
-    setCandSpeaking(true);
-    setSubtitle("You: [Listening...]");
+  // Toggle recording state
+  const toggleRecording = async () => {
+    if (isRecording) {
+      stopRecording();
+      // Auto-proceed to next question or submit if last question
+      if (currentQuestionIndex < questions.length - 1) {
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+        await askQuestion(questions[currentQuestionIndex + 1]);
+      } else {
+        await submitInterview();
+      }
+    } else {
+      startRecording();
+    }
+  };
+
+  // Start recording answer
+  const startRecording = async () => {
+    if (!micPermissionGranted) {
+      const hasPermission = await checkMicrophonePermission();
+      if (!hasPermission) return;
+    }
+
+    if (!recognitionRef.current) {
+      recognitionRef.current = initializeRecognition();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = false;
+    }
+
+    setIsRecording(true);
+    setSubtitle("You: [Listening... Speak now]");
     
-    try {
-      const transcript = await new Promise((resolve, reject) => {
-        recognitionRef.current.onresult = (event) => {
-          resolve(event.results[0][0].transcript);
-        };
-        
-        recognitionRef.current.onerror = (event) => {
-          reject(new Error(`Speech recognition error: ${event.error}`));
-        };
-        
-        recognitionRef.current.start();
-      });
-      
-      const newAnswers = [...candidateAnswers];
-      newAnswers[currentQuestionIndex] = transcript;
-      setCandidateAnswers(newAnswers);
+    recognitionRef.current.onresult = (event) => {
+      const transcript = event.results[event.results.length - 1][0].transcript;
       setSubtitle(`You: ${transcript}`);
-      return transcript;
-    } catch (err) {
-      setError(`Failed to record answer: ${err.message}`);
-      return "";
-    } finally {
-      setCandSpeaking(false);
-    }
-  };
-  
-  // Main interview flow controller
-  const runInterviewFlow = async () => {
-    if (questions.length === 0) return;
+      // candidateAnswers[currentQuestionIndex]=transcript;
+      const updatedAnswers = [...candidateAnswers];
+      updatedAnswers[currentQuestionIndex] = transcript;
+      setCandidateAnswers(updatedAnswers);
+    };
     
-    for (let i = 0; i < questions.length; i++) {
-      setCurrentQuestionIndex(i);
-      await askQuestion(questions[i]);
-      await getAnswer();
-      await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second pause between Q&A
-    }
-    
-    await submitInterview();
+    recognitionRef.current.onerror = (event) => {
+      console.error("Recognition error:", event.error);
+      if (event.error !== 'no-speech') {
+        setSubtitle("You: [Recording error]");
+      }
+    };
+
+    recognitionRef.current.start();
   };
-  
+
+  // Stop recording answer
+  const stopRecording = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+    }
+    setIsRecording(false);
+    setSubtitle(prev => prev.includes("[Listening...") ? "You: [Answer submitted]" : prev);
+  };
+
   // Submit interview results for evaluation
   const submitInterview = async () => {
-    console.log(candidateAnswers)
+    // console.log(candidateAnswers);
     setLoading(true);
     const payload = {
       questions,
@@ -121,11 +152,12 @@ const InterviewSessionPage = () => {
   
   // End the interview early
   const handleEndInterview = () => {
+    stopRecording();
     cancelSpeech();
     if (recognitionRef.current) {
       recognitionRef.current.abort();
     }
-    navigate('/dashboard');
+    submitInterview(); // Submit whatever answers we have
   };
   
   // Initial data loading and cleanup
@@ -135,9 +167,14 @@ const InterviewSessionPage = () => {
       return;
     }
     
-    // Initialize speech recognition
-    recognitionRef.current = initializeRecognition();
+    // Initialize speech recognition and check permissions
+    const init = async () => {
+      await checkMicrophonePermission();
+      recognitionRef.current = initializeRecognition();
+    };
     
+    init();
+
     // Fetch questions and answers only once
     const fetchQuestionsAndAnswers = async () => {
       if (apiCalledRef.current) return;
@@ -166,6 +203,11 @@ const InterviewSessionPage = () => {
           setAnswers(data.answers);
           setCandidateAnswers(new Array(data.questions.length).fill(''));
           setLoading(false);
+          
+          // Start with first question
+          if (data.questions.length > 0) {
+            askQuestion(data.questions[0]);
+          }
         } else {
           throw new Error('Failed to fetch interview questions');
         }
@@ -178,19 +220,10 @@ const InterviewSessionPage = () => {
     fetchQuestionsAndAnswers();
     
     return () => {
-      if (recognitionRef.current) {
-        recognitionRef.current.abort();
-      }
+      stopRecording();
       cancelSpeech();
     };
   }, [interviewDetails]);
-  
-  // Start the interview flow after questions are loaded
-  useEffect(() => {
-    if (questions.length > 0) {
-      runInterviewFlow();
-    }
-  }, [questions]);
   
   // Get the appropriate video URL based on state
   const getInterviewerVideo = () => {
@@ -248,6 +281,7 @@ const InterviewSessionPage = () => {
           <div className="video-box candidate">
             <div className="video-feed">
               <div className="camera-placeholder">
+                {isRecording && <div className="pulse-ring"></div>}
                 <span>Your camera view</span>
               </div>
             </div>
@@ -256,10 +290,27 @@ const InterviewSessionPage = () => {
         </div>
         
         <div className="subtitle-area">
-          <p className="subtitle-text">{subtitle}</p>
+          <p className={`subtitle-text ${isRecording ? 'recording-active' : ''}`}>
+            {subtitle}
+          </p>
         </div>
         
         <div className="interview-actions">
+          <button 
+            className={`speak-btn ${isRecording ? 'recording' : ''}`}
+            onClick={toggleRecording}
+          >
+            {isRecording ? (
+              <>
+                <MicOff size={18} /> End Answer
+              </>
+            ) : (
+              <>
+                <Mic size={18} /> Speak Answer
+              </>
+            )}
+          </button>
+          
           <button className="btn btn-outline" onClick={handleEndInterview}>
             End Interview
           </button>
