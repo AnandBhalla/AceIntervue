@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import '../styles/InterviewDetailPage.css';
+import '../Styles/InterviewDetailPage.css';
 import john from '../assets/john.jpeg';
 import jane from '../assets/jane.jpeg';
 import { showToast } from '../utils/toast';
