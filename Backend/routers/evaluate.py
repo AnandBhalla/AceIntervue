@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from database import get_db
-from utils import evaluate
+from utils.evaluate import evaluate
 from models import EvaluateReq, EvaluateRes
 
 router = APIRouter(tags=["Evaluation"])
@@ -12,7 +12,7 @@ async def evaluate_candidate(
     db: AsyncIOMotorDatabase = Depends(get_db),
 ):
     # Run evaluation logic
-    result = await evaluate(data.dict())
+    result =  evaluate(data.dict())
 
     # Insert full request data and result into the DB
     await db.interviews.insert_one({

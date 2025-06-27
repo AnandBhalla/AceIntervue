@@ -120,12 +120,14 @@ const InterviewSessionPage = () => {
   const submitInterview = async () => {
     console.log(candidateAnswers);
     setLoading(true);
+    const user = localStorage.getItem("user");
     const payload = {
       questions,
       answers,
       candidateAnswers,
       domain,
-      techStack
+      techStack,
+      user
     };
     
     try {
@@ -134,7 +136,7 @@ const InterviewSessionPage = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      
+      console.log(response);
       if (response.ok) {
         const evaluationData = await response.json();
         navigate('/results', {

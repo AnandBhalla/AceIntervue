@@ -91,7 +91,7 @@ const InterviewDetailPage = () => {
                 value={domain} 
                 onChange={(e) => {
                   setDomain(e.target.value);
-                  setTechStacks([]); // Reset tech stacks when domain changes
+                  setTechStacks([]);
                 }}
               >
                 <option value="">Select Domain</option>
