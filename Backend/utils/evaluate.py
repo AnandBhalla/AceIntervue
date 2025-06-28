@@ -51,7 +51,7 @@ def score_grammar(text: str) -> float:
         error_count = len(matches)
         word_count = len(text.split())
 
-        print(error_count)
+        # print(error_count)
         if word_count == 0:
             return 10.0
         errors_per_100 = (error_count / word_count) * 100
