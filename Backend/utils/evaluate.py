@@ -6,6 +6,11 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from sentence_transformers import SentenceTransformer, util
+import google.generativeai as genai
+from dotenv import load_dotenv
+import os
+import json
+import ast
 
 # Setup
 # nltk.download('punkt')
@@ -30,11 +35,22 @@ def evaluate(data: Dict) -> Dict[str, float]:
         repetition_scores.append(score_repetition(ca))
         accuracy_scores.append(score_content_accuracy(ca, ref))
 
+    grammar_score=round(avg(grammar_scores), 2)
+    filler_words_score=round(avg(filler_scores), 2)
+    repetition_score=round(avg(repetition_scores), 2)
+    content_accuracy_score=round(avg(accuracy_scores), 2)
+    overall_score=(round((grammar_score+filler_words_score+repetition_score+content_accuracy_score)/4))*10
+    ai_advice,tips=generate_summary(grammar_score,filler_words_score,repetition_score,content_accuracy_score,overall_score)
+    print(tips)
+    print(type(tips))
     return {
-        "grammar": round(avg(grammar_scores), 2),
-        "filler_words": round(avg(filler_scores), 2),
-        "repetition": round(avg(repetition_scores), 2),
-        "content_accuracy": round(avg(accuracy_scores), 2),
+        "grammar_score": grammar_score*10,
+        "filler_words_score": filler_words_score*10,
+        "repetition_score": repetition_score*10,
+        "content_accuracy_score": content_accuracy_score*10,
+        "overall_score":overall_score,
+        "ai_advice":ai_advice,
+        "tips":tips,
     }
 
 def avg(lst):
@@ -66,7 +82,7 @@ def score_grammar(text: str) -> float:
         else:
             return 2
     except Exception:
-        return 5.0  # fallback score on API failure
+        return 0  # fallback score on API failure
 
 
 
@@ -109,6 +125,8 @@ def score_repetition(text: str) -> float:
 
 # Semantic content similarity
 def score_content_accuracy(candidate: str, reference: str) -> float:
+    # if(candidate==""):   
+    #     return 0
     embedding1 = model.encode(candidate, convert_to_tensor=True)
     embedding2 = model.encode(reference, convert_to_tensor=True)
     similarity = util.cos_sim(embedding1, embedding2).item()
@@ -123,3 +141,32 @@ def score_content_accuracy(candidate: str, reference: str) -> float:
         return 4
     else:
         return 2
+
+def generate_summary(grammar_score,filler_words_score,repetition_score,content_accuracy_score,overall_score):
+    api_key = os.getenv("GOOGLE_API_KEY")
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel('gemini-2.0-flash')
+    prompt = (
+        "You are given scores of an interview generate an advice based on that how to improve and what to work upon. If everything seems perfect praise the candidate."
+        f"grammar accuracy: {grammar_score}, filler words: {filler_words_score}, repetition of words: {repetition_score}, content accuracy: {content_accuracy_score}, overall score: {overall_score}"
+        "give 3 lines as a paragraph and 5 points of improvement starting with exact heading as :`tips`. followed by a json like list in format {'','',''...}"
+        "Do not include any additional text, commentary, or formatting like bold, italics, etc."
+    )
+    response = model.generate_content(prompt)
+    raw_text = response.candidates[0].content.parts[0].text
+    # cleaned = raw_text.strip().removeprefix("```json").removesuffix("```").strip()
+    tips = extract_tips(raw_text)
+    # print(tips)
+    return raw_text,tips
+
+def extract_tips(raw_text):
+    # Find the line starting with 'tips'
+    match = re.search(r"tips\s*:\s*(\{.*?\})", raw_text, re.DOTALL)
+    if match:
+        tips_str = match.group(1)
+        try:
+            tips_list = ast.literal_eval(tips_str)
+            return list(tips_list)
+        except Exception as e:
+            print("Error parsing tips:", e)
+    return []

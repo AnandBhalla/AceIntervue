@@ -118,7 +118,7 @@ const InterviewSessionPage = () => {
 
   // Submit interview results for evaluation
   const submitInterview = async () => {
-    console.log(candidateAnswers);
+    // console.log(candidateAnswers);
     setLoading(true);
     const user = localStorage.getItem("user");
     const payload = {
@@ -129,18 +129,23 @@ const InterviewSessionPage = () => {
       techStack,
       user
     };
-    
+    const qna={
+      questions,
+      answers,
+      candidateAnswers,
+    }
     try {
       const response = await fetch(`${backendUrl}/evaluate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      console.log(response);
+      // console.log(response);
       if (response.ok) {
         const evaluationData = await response.json();
+        // console.log(evaluationData)
         navigate('/results', {
-          state: { interviewDetails, evaluationReport: evaluationData }
+          state: { interviewDetails, evaluationReport: evaluationData.results ,qna}
         });
       } else {
         setError('Failed to evaluate interview. Please try again.');

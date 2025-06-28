@@ -26,10 +26,8 @@ const InterviewDetailPage = () => {
       try {
         const res = await axios.get(`${backendUrl}/domain/`);
         setAvailableDomains(res.data);
-      } catch (error) {
-        console.error('Error fetching domains:', error);
-        showToast('Failed to fetch domains', 'error');
-      } finally {
+      }  
+      finally {
         setLoadingDomains(false);
       }
     };
