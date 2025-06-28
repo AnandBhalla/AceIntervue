@@ -1,45 +1,48 @@
 
-import React from 'react';
+import React, { useState ,useEffect} from 'react';
 import { Link } from 'react-router-dom';
 import '../Styles/DashboardPage.css';
+import axios from 'axios';
 
 const DashboardPage = () => {
   // Mock data for previous interviews
-  const previousInterviews = [
-    {
-      id: 1,
-      date: '2025-04-15',
-      domain: 'Web Development',
-      score: 85,
-      techStack: ['JavaScript', 'React', 'Node.js'],
-    },
-    {
-      id: 2,
-      date: '2025-04-10',
-      domain: 'Data Science',
-      score: 78,
-      techStack: ['Python', 'TensorFlow', 'SQL'],
-    },
-    {
-      id: 3,
-      date: '2025-04-05',
-      domain: 'Web Development',
-      score: 92,
-      techStack: ['JavaScript', 'Angular', 'Node.js'],
-    },
-    {
-      id: 4,
-      date: '2025-03-28',
-      domain: 'DevOps',
-      score: 81,
-      techStack: ['Docker', 'Kubernetes', 'AWS'],
-    },
-  ];
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const user = localStorage.getItem('user');
+  // console.log(user)
+  const [interviews, setInterviews] = useState([])
+  const [loadingInterviews, setloadingInterviews] = useState(true);
+
+  useEffect(() => {
+    const fetchInterviews = async () => {
+      try {
+        const res = await axios.get(`${backendUrl}/profile/${user}`);
+        setInterviews(res.data)
+      }  
+      finally {
+        setloadingInterviews(false);
+      }
+    };
+    fetchInterviews();
+  }, [backendUrl]);
+
+
+// console.log(interviews)
+
+  const previousInterviews=[]
+
+
 
   // Calculate average score
-  const averageScore = Math.round(
-    previousInterviews.reduce((acc, interview) => acc + interview.score, 0) / previousInterviews.length
-  );
+  const scores = interviews
+  .map(interview => interview.result?.overall_score) 
+
+  // console.log(scores)
+
+const averageScore = scores.length
+  ? Math.round(scores.reduce((acc, score) => acc + score, 0) / scores.length)
+  : 0;
+
+  // console.log(averageScore)
 
   return (
     <div className="dashboard-page">
@@ -54,7 +57,7 @@ const DashboardPage = () => {
             <h2>Interview Summary</h2>
             <div className="summary-stats">
               <div className="stat-item">
-                <div className="stat-value">{previousInterviews.length}</div>
+                <div className="stat-value">{interviews.length}</div>
                 <div className="stat-label">Interviews</div>
               </div>
               <div className="stat-item">
@@ -63,7 +66,7 @@ const DashboardPage = () => {
               </div>
               <div className="stat-item">
                 <div className="stat-value">
-                  {previousInterviews.reduce((max, interview) => Math.max(max, interview.score), 0)}
+                  {Math.max(...scores)}
                 </div>
                 <div className="stat-label">Best Score</div>
               </div>
@@ -96,7 +99,7 @@ const DashboardPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {previousInterviews.map((interview) => (
+                {interviews.map((interview) => (
                   <tr key={interview.id}>
                     <td>{new Date(interview.date).toLocaleDateString()}</td>
                     <td>{interview.domain}</td>
@@ -110,9 +113,9 @@ const DashboardPage = () => {
                     <td>
                       <div 
                         className="score-badge" 
-                        style={{ backgroundColor: getScoreColor(interview.score) }}
+                        style={{ backgroundColor: getScoreColor(interview.result.overall_score) }}
                       >
-                        {interview.score}%
+                        {interview.result.overall_score}%
                       </div>
                     </td>
                     <td>

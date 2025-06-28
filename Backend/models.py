@@ -73,6 +73,11 @@ class Domain(BaseModel):
     domain: str
     techStacks: List[str]
 
+class InterviewResponse(BaseModel):
+    techStack: List[str]
+    domain: str
+    result: dict   
+
 class QnARequest(BaseModel):
     domain: str
     techStack: List[str]
@@ -107,3 +112,4 @@ class EvaluateReq(BaseModel):
 
 class EvaluateRes(BaseModel):
     results: Dict[str, Any]
+
