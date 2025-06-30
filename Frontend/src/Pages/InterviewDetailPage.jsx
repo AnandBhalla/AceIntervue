@@ -14,7 +14,7 @@ const InterviewDetailPage = () => {
   const [interviewMode, setInterviewMode] = useState('audio');
   const [interviewType, setInterviewType] = useState('qna');
   const [interviewer, setInterviewer] = useState('john');
-  const [questionCount, setQuestionCount] = useState(5);
+  const [questionCount, setQuestionCount] = useState(3);
   
   const [availableDomains, setAvailableDomains] = useState([]);
   const [loadingDomains, setLoadingDomains] = useState(true);
@@ -141,6 +141,7 @@ const InterviewDetailPage = () => {
                 type="button"
                 className={`tab-button ${interviewMode === 'video' ? 'active' : ''}`}
                 onClick={() => setInterviewMode('video')}
+                disabled
               >
                 Video
               </button>
@@ -155,6 +156,7 @@ const InterviewDetailPage = () => {
                 type="button"
                 className={`tab-button ${interviewType === 'coding' ? 'active' : ''}`}
                 onClick={() => setInterviewType('coding')}
+                disabled
               >
                 Coding
               </button>
@@ -169,6 +171,7 @@ const InterviewDetailPage = () => {
                 type="button"
                 className={`tab-button ${interviewType === 'hr' ? 'active' : ''}`}
                 onClick={() => setInterviewType('hr')}
+                disabled
               >
                 HR
               </button>
@@ -191,6 +194,7 @@ const InterviewDetailPage = () => {
                 type="button"
                 className={`interviewer-tab ${interviewer === 'jane' ? 'active' : ''}`}
                 onClick={() => setInterviewer('jane')}
+                disabled
               >
                 <img src={jane} alt="Jane Doe" className="interviewer-avatar" />
                 <span>Jane Doe (Female)</span>
@@ -213,6 +217,7 @@ const InterviewDetailPage = () => {
                 type="button"
                 className={`count-tab ${questionCount === 5 ? 'active' : ''}`}
                 onClick={() => setQuestionCount(5)}
+                disabled
               >
                 5 Questions (25 mins)
               </button>
@@ -220,6 +225,7 @@ const InterviewDetailPage = () => {
                 type="button"
                 className={`count-tab ${questionCount === 10 ? 'active' : ''}`}
                 onClick={() => setQuestionCount(10)}
+                disabled
               >
                 10 Questions (45 mins)
               </button>

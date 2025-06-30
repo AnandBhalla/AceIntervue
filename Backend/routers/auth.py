@@ -13,12 +13,9 @@ from utils.auth import get_current_user
 
 router = APIRouter(tags=["Authentication"])
 
+# signup route
 @router.post("/signup", response_model=models.UserOut, status_code=status.HTTP_201_CREATED)
 async def create_user(user: models.UserCreate, db: AsyncIOMotorDatabase = Depends(get_db)):
-    """
-    Register a new user
-    """
-    # Check if email already exists
     existing_user = await db.users.find_one({"email": user.email})
     if existing_user:
         raise HTTPException(
@@ -26,10 +23,8 @@ async def create_user(user: models.UserCreate, db: AsyncIOMotorDatabase = Depend
             detail="Email already registered"
         )
 
-    # Hash the password
     hashed_password = await get_password_hash(user.password)
-    
-    # Prepare user document
+
     user_dict = user.dict()
     user_dict.update({
         "password": hashed_password,
@@ -37,29 +32,23 @@ async def create_user(user: models.UserCreate, db: AsyncIOMotorDatabase = Depend
         "is_verified": False,
         "model": models.UserModel.free
     })
-    
-    # Insert user into database
+
     result = await db.users.insert_one(user_dict)
-    
+
     if not result.acknowledged:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to create user"
         )
-    
-    # Get the created user
+
     created_user = await db.users.find_one({"_id": result.inserted_id})
-    
-    # Create access token for email verification
+
     access_token = create_access_token(data={"user_id": str(created_user["_id"])})
-    
-    # Send verification email
+
     email_sent = await send_verification_email(user.email, access_token)
     if not email_sent:
-        # Log the issue but continue - don't expose email sending failures to client
         pass
-    
-    # Format response data
+
     user_data = {
         "_id": str(created_user["_id"]),
         "email": created_user["email"],
@@ -68,18 +57,15 @@ async def create_user(user: models.UserCreate, db: AsyncIOMotorDatabase = Depend
         "is_verified": created_user["is_verified"],
         "created_at": created_user["created_at"]
     }
-    
+
     return models.UserOut(**user_data)
 
+# login route
 @router.post("/login", response_model=models.Token)
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: AsyncIOMotorDatabase = Depends(get_db)
 ):
-    """
-    Authenticate a user and return an access token
-    """
-    # Find user by email (username field contains email in OAuth2 form)
     user = await db.users.find_one({"email": form_data.username})
     
     if not user:
@@ -88,23 +74,19 @@ async def login(
             detail="Invalid credentials"
         )
     
-    # Verify password
     if not await verify_password(form_data.password, user["password"]):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials"
         )
     
-    # Check if email is verified
     if not user.get("is_verified", False):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Email not verified"
         )
     
-    # Create access token
     user_id = str(user["_id"])
-    # print(user_id)
     access_token = create_access_token(data={"user_id": user_id})
     
     return {
@@ -113,13 +95,10 @@ async def login(
         "user_id": user_id,
     }
 
+# email verification route
 @router.get("/verify-email")
 async def verify_email(token: str, db: AsyncIOMotorDatabase = Depends(get_db)):
-    """
-    Verify a user's email address using the token from email
-    """
     try:
-        # Decode token
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         user_id = payload.get("user_id")
         
@@ -129,7 +108,6 @@ async def verify_email(token: str, db: AsyncIOMotorDatabase = Depends(get_db)):
                 detail="Invalid verification token"
             )
         
-        # Update user verification status
         result = await db.users.update_one(
             {"_id": ObjectId(user_id)},
             {"$set": {"is_verified": True}}
@@ -149,11 +127,27 @@ async def verify_email(token: str, db: AsyncIOMotorDatabase = Depends(get_db)):
             detail="Invalid or expired verification token"
         )
 
+# resend verification route
+@router.post("/resend-verification")
+async def resend_verification(email: str, db: AsyncIOMotorDatabase = Depends(get_db)):
+    user = await db.users.find_one({"email": email})
+    
+    if not user:
+        return {"message": "If your email is registered, a verification link has been sent"}
+    
+    if user.get("is_verified", False):
+        return {"message": "Email is already verified"}
+    
+    access_token = create_access_token(data={"user_id": str(user["_id"])})
+    
+    await send_verification_email(email, access_token)
+    
+    return {"message": "Verification email sent"}
+
+
+# current user route
 @router.get("/me", response_model=models.UserOut)
 async def read_users_me(current_user: dict = Depends(get_current_user)):
-    """
-    Return the current authenticated user
-    """
     user_data = {
         "_id": str(current_user["_id"]),
         "email": current_user["email"],
@@ -165,24 +159,4 @@ async def read_users_me(current_user: dict = Depends(get_current_user)):
     
     return models.UserOut(**user_data)
 
-@router.post("/resend-verification")
-async def resend_verification(email: str, db: AsyncIOMotorDatabase = Depends(get_db)):
-    """
-    Resend verification email to a user
-    """
-    user = await db.users.find_one({"email": email})
-    
-    if not user:
-        # Don't reveal whether email exists
-        return {"message": "If your email is registered, a verification link has been sent"}
-    
-    if user.get("is_verified", False):
-        return {"message": "Email is already verified"}
-    
-    # Create new token
-    access_token = create_access_token(data={"user_id": str(user["_id"])})
-    
-    # Send verification email
-    await send_verification_email(email, access_token)
-    
-    return {"message": "Verification email sent"}
+

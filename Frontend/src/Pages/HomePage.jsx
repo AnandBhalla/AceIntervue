@@ -94,12 +94,12 @@ const HomePage = () => {
               <p>Save money compared to hiring interview coaches while getting similar benefits</p>
             </div>
             <div className="benefit">
-              <h3>Unbiased Feedback</h3>
-              <p>Get objective analysis of your performance without human judgment</p>
+              <h3>Resume Enhancement</h3>
+              <p>Get AI-driven feedback on your resume to ensure it aligns with your target job roles and highlights your strengths effectively.</p>
             </div>
             <div className="benefit">
               <h3>Affordable Preparation</h3>
-              <p>Save money compared to hiring interview coaches while getting similar benefits</p>
+              <p>Quickly create professional, job-ready resumes using our AI-assisted builder — tailored to your industry, experience level, and goals.</p>
             </div>
           </div>
         </div>
@@ -110,16 +110,16 @@ const HomePage = () => {
           <h2 className="section-title">Coming Soon</h2>
           <div className="upcoming-grid">
             <div className="upcoming-feature">
-              <h3>Industry Expert Mode</h3>
-              <p>Practice with AI modeled after top professionals in your field</p>
+              <h3>Company-Specific Questions</h3>
+              <p>Practice with the most frequently asked questions from top companies like Google, Amazon, TCS, and more — updated regularly.</p>
             </div>
             <div className="upcoming-feature">
-              <h3>Multilingual Support</h3>
-              <p>Practice interviews in multiple languages to prepare for global opportunities</p>
+              <h3>Full Interview Rounds</h3>
+              <p>Simulate complete interview rounds including coding challenges, technical deep-dives, and HR questions for end-to-end preparation.</p>
             </div>
             <div className="upcoming-feature">
-              <h3>Custom Scenario Builder</h3>
-              <p>Create your own interview scenarios and questions</p>
+              <h3>Preparation Modules & Materials</h3>
+              <p>Access structured prep tracks, curated study material, and role-specific learning resources to sharpen your skills and boost your confidence.</p>
             </div>
           </div>
         </div>
@@ -129,18 +129,41 @@ const HomePage = () => {
         <div className="container">
           <h2 className="section-title">Frequently Asked Questions</h2>
           <div className="faq-container">
-            <div className="faq-item">
-              <div className="faq-question">How accurate is the AI interviewer?</div>
-              <div className="faq-answer">
-                <p>Our AI interviewer is trained on thousands of real interview scenarios and updated regularly to ensure the most realistic experience possible.</p>
-              </div>
-            </div>
-            <div className="faq-item">
-              <div className="faq-question">How is my performance evaluated?</div>
-              <div className="faq-answer">
-                <p>Your performance is evaluated across multiple dimensions including content quality, delivery, confidence, and relevance to the question.</p>
-              </div>
-            </div>
+<div className="faq-item">
+  <div className="faq-question">How does AceIntervue help me prepare for interviews?</div>
+  <div className="faq-answer">
+    <p>AceIntervue offers AI-powered mock interviews tailored to your role and industry, providing detailed feedback on your answers, communication, and confidence.</p>
+  </div>
+</div>
+
+<div className="faq-item">
+  <div className="faq-question">What kind of feedback do I receive after an interview?</div>
+  <div className="faq-answer">
+    <p>You receive comprehensive feedback on communication, content accuracy, facial expressions, Authenticity  and an overall score with tips to improve.</p>
+  </div>
+</div>
+
+<div className="faq-item">
+  <div className="faq-question">Can I track my performance over time?</div>
+  <div className="faq-answer">
+    <p>Yes, AceIntervue tracks your interview performance history so you can monitor progress and focus on areas needing improvement.</p>
+  </div>
+</div>
+
+<div className="faq-item">
+  <div className="faq-question">Does AceIntervue help with resumes?</div>
+  <div className="faq-answer">
+    <p>Yes, we offer AI-powered resume analysis and a resume builder to help you create professional, targeted resumes aligned with your job goals.</p>
+  </div>
+</div>
+
+<div className="faq-item">
+  <div className="faq-question">Is AceIntervue suitable for both students and professionals?</div>
+  <div className="faq-answer">
+    <p>Absolutely. Whether you're a fresher or an experienced candidate, AceIntervue adapts to your background and customizes interviews accordingly.</p>
+  </div>
+</div>
+
           </div>
         </div>
       </section>

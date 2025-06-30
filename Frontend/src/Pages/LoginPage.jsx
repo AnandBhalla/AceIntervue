@@ -65,10 +65,6 @@ const LoginPage = () => {
             />
           </div>
 
-          {/* <div className='form-group forgot-password'>
-            <Link to='/forgot-password'>Forgot Password?</Link>
-          </div> */}
-
           <button 
             type='submit' 
             className='btn auth-btn'

@@ -9,7 +9,6 @@ const VerifyEmailPage = () => {
   const location = useLocation();
 
   useEffect(() => {
-    console.log('useEffect running');
     const params = new URLSearchParams(location.search);
     const token = params.get('token');
 

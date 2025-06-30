@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../Styles/AuthPages.css';
-import { signup } from '../services/api';
+import { signup, resendVerification } from '../services/api';
 import { showToast } from '../utils/toast';
 
 const SignupPage = () => {
@@ -40,8 +40,13 @@ const SignupPage = () => {
     }
   };
 
-  const handleVerifyEmail = () => {
-    navigate('/verify-email');
+  const handleResendVerification = async () => {
+    const response = await resendVerification(email);
+    if (response.status === 200) {
+      showToast('Verification email resent', 'success');
+    } else {
+      showToast('Failed to resend verification email', 'error');
+    }
   };
 
   const renderStep = () => {
@@ -102,15 +107,15 @@ const SignupPage = () => {
           <div className='auth-form'>
             <h3>We've sent you an email to verify your account.</h3>
             <p>Please check your inbox and follow the verification instructions.</p>
-            {/* <div className='resend-email'>
+            <div className='resend-email'>
               <button
                 type='button'
                 className='text-btn'
-                onClick={handleSubmit}
+                onClick={handleResendVerification}
               >
                 Resend Verification Email
               </button>
-            </div> */}
+            </div>
           </div>
         );
 
