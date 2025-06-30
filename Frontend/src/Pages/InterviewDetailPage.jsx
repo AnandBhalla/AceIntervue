@@ -1,38 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import '../Styles/InterviewDetailPage.css';
 import john from '../assets/john.jpeg';
 import jane from '../assets/jane.jpeg';
 import { showToast } from '../utils/toast';
+import { getDomains } from '../services/api';
 
 const InterviewDetailPage = () => {
   const navigate = useNavigate();
-  
+
   const [domain, setDomain] = useState('');
   const [techStacks, setTechStacks] = useState([]);
   const [interviewMode, setInterviewMode] = useState('audio');
   const [interviewType, setInterviewType] = useState('qna');
   const [interviewer, setInterviewer] = useState('john');
   const [questionCount, setQuestionCount] = useState(3);
-  
+
   const [availableDomains, setAvailableDomains] = useState([]);
   const [loadingDomains, setLoadingDomains] = useState(true);
-  
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchDomains = async () => {
       try {
-        const res = await axios.get(`${backendUrl}/domain/`);
+        const res = await getDomains(); 
         setAvailableDomains(res.data);
-      }  
-      finally {
+      } catch (err) {
+        showToast('Failed to load domains', 'error');
+      } finally {
         setLoadingDomains(false);
       }
     };
     fetchDomains();
-  }, [backendUrl]);
+  }, []);
 
   const handleTechStackChange = (tech) => {
     if (techStacks.includes(tech)) {
@@ -78,7 +77,6 @@ const InterviewDetailPage = () => {
 
         <form className="interview-form" onSubmit={handleSubmit}>
 
-          {/* Domain Selection */}
           <div className="form-group">
             <label className="form-label">Select Domain</label>
             {loadingDomains ? (
@@ -102,7 +100,6 @@ const InterviewDetailPage = () => {
             )}
           </div>
 
-          {/* Tech Stack Selection */}
           {domain && availableDomains.find(d => d.domain === domain) && (
             <div className="form-group">
               <label className="form-label">Select Tech Stacks</label>
@@ -126,7 +123,6 @@ const InterviewDetailPage = () => {
             </div>
           )}
 
-          {/* Mode Selection (Audio/Video) */}
           <div className="form-group">
             <label className="form-label">Mode</label>
             <div className="tab-group">
@@ -148,7 +144,6 @@ const InterviewDetailPage = () => {
             </div>
           </div>
 
-          {/* Type Selection (Coding, Q&A, HR) */}
           <div className="form-group">
             <label className="form-label">Type</label>
             <div className="tab-group">
@@ -178,7 +173,6 @@ const InterviewDetailPage = () => {
             </div>
           </div>
 
-          {/* Interviewer Selection */}
           <div className="form-group">
             <label className="form-label">Choose Interviewer</label>
             <div className="interviewer-tabs">
@@ -202,7 +196,6 @@ const InterviewDetailPage = () => {
             </div>
           </div>
 
-          {/* Question Count Selection */}
           <div className="form-group">
             <label className="form-label">Number of Questions</label>
             <div className="question-count-tabs">

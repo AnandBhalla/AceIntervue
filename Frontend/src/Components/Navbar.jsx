@@ -1,13 +1,28 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import '../Styles/Navbar.css';
-import { Menu, User, X } from 'lucide-react';
+import '../styles/Navbar.css';
+import { Menu, User, X, ChevronDown, Bot } from 'lucide-react';
 
 const Navbar = ({ isLoggedIn, onLogout }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState(null);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleDropdownEnter = (dropdownName) => {
+    setActiveDropdown(dropdownName);
+  };
+
+  const handleDropdownLeave = () => {
+    setActiveDropdown(null);
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+    setActiveDropdown(null);
   };
 
   return (
@@ -23,37 +38,77 @@ const Navbar = ({ isLoggedIn, onLogout }) => {
         
         <ul className={isMenuOpen ? 'nav-menu active' : 'nav-menu'}>
           <li className="nav-item">
-            <Link to="/" className="nav-link" onClick={() => setIsMenuOpen(false)}>
+            <Link to="/" className="nav-link" onClick={closeMenu}>
               Home
             </Link>
           </li>
-          <li className="nav-item">
-            <Link to="/interview" className="nav-link" onClick={() => setIsMenuOpen(false)}>
+          
+          <li 
+            className="nav-item dropdown-container"
+            onMouseEnter={() => handleDropdownEnter('interview')}
+            onMouseLeave={handleDropdownLeave}
+          >
+            <Link to="/interview" className="nav-link dropdown-trigger" onClick={closeMenu}>
               AI Interview
+              <ChevronDown size={16} className={`dropdown-arrow ${activeDropdown === 'interview' ? 'rotated' : ''}`} />
             </Link>
+            <div className={`nav-dropdown ${activeDropdown === 'interview' ? 'active' : ''}`}>
+              <Link to="/interview/technical" className="nav-dropdown-item" onClick={closeMenu}>
+                Technical Interview
+              </Link>
+              <Link to="/interview/hr" className="nav-dropdown-item" onClick={closeMenu}>
+                HR Interview
+              </Link>
+              <Link to="/interview/coding" className="nav-dropdown-item" onClick={closeMenu}>
+                Coding Interview
+              </Link>
+              <Link to="/interview/company-specific" className="nav-dropdown-item" onClick={closeMenu}>
+                Company Specific Interviews
+              </Link>
+              <Link to="/interview/resume-based" className="nav-dropdown-item" onClick={closeMenu}>
+                Resume Based Interview
+              </Link>
+            </div>
           </li>
-          <li className="nav-item">
-            <Link to="/preparation" className="nav-link" onClick={() => setIsMenuOpen(false)}>
+
+
+          <li 
+            className="nav-item dropdown-container"
+            onMouseEnter={() => handleDropdownEnter('resume')}
+            onMouseLeave={handleDropdownLeave}
+          >
+            <Link to="/resume" className="nav-link dropdown-trigger" onClick={closeMenu}>
+              Resume
+              <ChevronDown size={16} className={`dropdown-arrow ${activeDropdown === 'resume' ? 'rotated' : ''}`} />
+            </Link>
+            <div className={`nav-dropdown ${activeDropdown === 'resume' ? 'active' : ''}`}>
+              <Link to="/resume/builder" className="nav-dropdown-item" onClick={closeMenu}>
+                <Bot size={16} className="dropdown-icon" />
+                AI Builder
+              </Link>
+              <Link to="/resume/customizer" className="nav-dropdown-item" onClick={closeMenu}>
+                <Bot size={16} className="dropdown-icon" />
+                AI Customizer
+              </Link>
+              <Link to="/resume/analyzer" className="nav-dropdown-item" onClick={closeMenu}>
+                <Bot size={16} className="dropdown-icon" />
+                AI Analyzer
+              </Link>
+            </div>
+          </li>
+
+
+          {/* <li className="nav-item">
+            <Link to="/preparation" className="nav-link" onClick={closeMenu}>
               Preparation
             </Link>
           </li>
+
           <li className="nav-item">
-            <Link to="/resume" className="nav-link" onClick={() => setIsMenuOpen(false)}>
-              Resume
-            </Link>
-          </li>
-          {/* <li className="nav-item">
-            <Link to="/cv" className="nav-link" onClick={() => setIsMenuOpen(false)}>
-              CV
+            <Link to="/pricing" className="nav-link" onClick={closeMenu}>
+              Pricing
             </Link>
           </li> */}
-          {/* {isLoggedIn && (
-            <li className="nav-item">
-              <Link to="/dashboard" className="nav-link" onClick={() => setIsMenuOpen(false)}>
-                Dashboard
-              </Link>
-            </li>
-          )} */}
         </ul>
         
         <div className="nav-auth">
@@ -63,14 +118,15 @@ const Navbar = ({ isLoggedIn, onLogout }) => {
                 <User size={20} />
               </button>
               <div className="dropdown-menu">
-                <Link to="/dashboard" className="dropdown-item">Profile</Link>
-                <button onClick={onLogout} className="dropdown-item">Logout</button>
+                <Link to="/about" className="dropdown-item">About Us</Link>
+                <Link to="/dashboard" className="dropdown-item">Dashboard</Link>
+                <Link to="/" onClick={onLogout} className="dropdown-item">LogOut</Link>
               </div>
             </div>
           ) : (
             <div className="auth-buttons">
               <Link to="/login" className="btn btn-outline btn-sm">Login</Link>
-              <Link to="/signup" className="btn btn-sm btn-outline">Sign Up</Link>
+              <Link to="/signup" className="btn btn-sm">Sign Up</Link>
             </div>
           )}
         </div>

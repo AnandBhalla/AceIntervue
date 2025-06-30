@@ -34,3 +34,5 @@ export const getCurrentUser = (token) =>
       Authorization: `Bearer ${token}`,
     },
   });
+
+export const getDomains = () => API.get('/domain/');

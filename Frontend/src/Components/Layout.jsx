@@ -1,22 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';  // Use useNavigate for redirect
+import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
 
 const Layout = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const navigate = useNavigate();  // Initialize the navigation hook
-  
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
+  const navigate = useNavigate();
+
   useEffect(() => {
-    // Check if user is logged in by checking if token exists in localStorage
-    const token = localStorage.getItem('token');
-    setIsLoggedIn(!!token); // Use token's existence for check (or validate token here)
+    const checkLoginStatus = () => {
+      setIsLoggedIn(!!localStorage.getItem('token'));
+    };
+
+    window.addEventListener('storage', checkLoginStatus);
+    
+    const observer = new MutationObserver(checkLoginStatus);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      window.removeEventListener('storage', checkLoginStatus);
+      observer.disconnect();
+    };
   }, []);
-  
+
   const handleLogout = () => {
-    localStorage.removeItem('token');  // Remove token on logout
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setIsLoggedIn(false);
-    navigate('/');  // Use navigate for redirection
+    navigate('/');
   };
 
   return (

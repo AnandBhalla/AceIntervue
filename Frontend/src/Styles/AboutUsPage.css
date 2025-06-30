@@ -1,0 +1,155 @@
+.about-page {
+  padding-bottom: 40px;
+}
+
+.about-hero {
+  background-color: var(--primary-blue);
+  color: var(--white);
+  padding: 80px 0;
+  text-align: center;
+}
+
+.about-hero h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  color: var(--white);
+}
+
+.about-hero p {
+  font-size: 1.3rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.who-we-are {
+  padding: 80px 0;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.content-text h2 {
+  color: var(--primary-blue);
+  margin-bottom: 30px;
+  font-size: 2.5rem;
+}
+
+.content-image img {
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.values-section {
+  padding: 80px 0;
+  background-color: var(--light-gray);
+}
+
+.section-title {
+  text-align: center;
+  margin-bottom: 50px;
+  font-size: 2rem;
+  position: relative;
+  padding-bottom: 15px;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background-color: var(--primary-blue);
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.value-card {
+  background-color: var(--white);
+  padding: 40px 30px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
+}
+
+.value-card:hover {
+  transform: translateY(-5px);
+}
+
+.value-card h3 {
+  color: var(--primary-blue);
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.privacy-section {
+  padding: 80px 0;
+}
+
+.privacy-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.privacy-item {
+  margin-bottom: 40px;
+  padding: 30px;
+  background-color: var(--white);
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  border-left: 4px solid var(--primary-blue);
+}
+
+.privacy-item h3 {
+  color: var(--primary-blue);
+  margin-bottom: 15px;
+}
+
+.contact-section {
+  padding: 80px 0;
+  background-color: var(--light-gray);
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.contact-info h3,
+.contact-form h3 {
+  color: var(--primary-blue);
+  margin-bottom: 20px;
+}
+
+.contact-form {
+  background-color: var(--white);
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 768px) {
+  .content-grid,
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  
+  .about-hero h1 {
+    font-size: 2.2rem;
+  }
+}

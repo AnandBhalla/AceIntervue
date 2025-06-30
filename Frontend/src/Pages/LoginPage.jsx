@@ -24,6 +24,7 @@ const LoginPage = () => {
 
     if (res?.data?.access_token) {
       localStorage.setItem('token', res.data.access_token);
+      window.dispatchEvent(new Event('storage'));
       localStorage.setItem('user', res.data.user_id);
       showToast('Login successful!', 'success');
       navigate('/dashboard');
