@@ -13,7 +13,7 @@ const InterviewDetailPage = () => {
   const [techStacks, setTechStacks] = useState([]);
   const [interviewMode, setInterviewMode] = useState('audio');
   const [interviewType, setInterviewType] = useState('qna');
-  const [interviewer, setInterviewer] = useState('john');
+  const [interviewer, setInterviewer] = useState('USM');
   const [questionCount, setQuestionCount] = useState(3);
 
   const [availableDomains, setAvailableDomains] = useState([]);
@@ -178,21 +178,38 @@ const InterviewDetailPage = () => {
             <div className="interviewer-tabs">
               <button
                 type="button"
-                className={`interviewer-tab ${interviewer === 'john' ? 'active' : ''}`}
-                onClick={() => setInterviewer('john')}
+                className={`interviewer-tab ${interviewer === 'USM' ? 'active' : ''}`}
+                onClick={() => setInterviewer('USM')}
               >
                 <img src={john} alt="John Doe" className="interviewer-avatar" />
-                <span>John Doe (Male)</span>
+                <span>John Doe </span>
               </button>
               <button
                 type="button"
-                className={`interviewer-tab ${interviewer === 'jane' ? 'active' : ''}`}
-                onClick={() => setInterviewer('jane')}
-                disabled
+                className={`interviewer-tab ${interviewer === 'USW' ? 'active' : ''}`}
+                onClick={() => setInterviewer('USW')}
               >
                 <img src={jane} alt="Jane Doe" className="interviewer-avatar" />
-                <span>Jane Doe (Female)</span>
+                <span>Jane Doe </span>
               </button>
+              <button
+  type="button"
+  className={`interviewer-tab ${interviewer === 'INM' ? 'active' : ''}`}
+  onClick={() => setInterviewer('INM')}
+>
+  <img src={john} alt="Ravi " className="interviewer-avatar" />
+  <span>Ravi </span>
+</button>
+
+<button
+  type="button"
+  className={`interviewer-tab ${interviewer === 'INW' ? 'active' : ''}`}
+  onClick={() => setInterviewer('INW')}
+>
+  <img src={jane} alt="Heera " className="interviewer-avatar" />
+  <span>Heera </span>
+</button>
+
             </div>
           </div>
 

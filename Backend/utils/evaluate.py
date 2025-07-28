@@ -2,7 +2,7 @@ from typing import Dict, List
 from collections import Counter
 import re
 import requests
-import nltk
+# import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from sentence_transformers import SentenceTransformer, util
@@ -11,10 +11,12 @@ from dotenv import load_dotenv
 import os
 import json
 import ast
-
+import nltk
+nltk.download()
 # Setup
-# nltk.download('punkt')
+# nltk.download('punkt', download_dir='./nltk_data')
 # nltk.download('stopwords')
+# nltk.data.path.append('./nltk_data')
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 FILLERS = {"um", "uh", "like", "you know", "so", "actually", "basically", "i mean", "well"}
@@ -41,8 +43,8 @@ def evaluate(data: Dict) -> Dict[str, float]:
     content_accuracy_score=round(avg(accuracy_scores), 2)
     overall_score=(round((grammar_score+filler_words_score+repetition_score+content_accuracy_score)/4))*10
     ai_advice,tips=generate_summary(grammar_score,filler_words_score,repetition_score,content_accuracy_score,overall_score)
-    print(tips)
-    print(type(tips))
+    # print(tips)
+    # print(type(tips))
     return {
         "grammar_score": grammar_score*10,
         "filler_words_score": filler_words_score*10,

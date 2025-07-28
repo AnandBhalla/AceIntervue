@@ -51,7 +51,7 @@ const InterviewSessionPage = () => {
   const askQuestion = async (question) => {
     setAiSpeaking(true);
     setSubtitle(`${interviewerName}: ${question}`);
-    await speak(question);
+    await speak(question,interviewerName);
     setAiSpeaking(false);
     await new Promise(resolve => setTimeout(resolve, 500));
   };
