@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../Styles/InterviewDetailPage.css';
-import john from '../assets/john.jpeg';
-import jane from '../assets/jane.jpeg';
+import USM from '../assets/USM.png';
+import USW from '../assets/USW.png';
+import INM from '../assets/INM.png';
+import INW from '../assets/INW.png';
 import { showToast } from '../utils/toast';
 import { getDomains } from '../services/api';
 
@@ -181,7 +183,7 @@ const InterviewDetailPage = () => {
                 className={`interviewer-tab ${interviewer === 'USM' ? 'active' : ''}`}
                 onClick={() => setInterviewer('USM')}
               >
-                <img src={john} alt="John Doe" className="interviewer-avatar" />
+                <img src={USM} alt="John Doe" className="interviewer-avatar" />
                 <span>John Doe </span>
               </button>
               <button
@@ -189,7 +191,7 @@ const InterviewDetailPage = () => {
                 className={`interviewer-tab ${interviewer === 'USW' ? 'active' : ''}`}
                 onClick={() => setInterviewer('USW')}
               >
-                <img src={jane} alt="Jane Doe" className="interviewer-avatar" />
+                <img src={USW} alt="Jane Doe" className="interviewer-avatar" />
                 <span>Jane Doe </span>
               </button>
               <button
@@ -197,8 +199,8 @@ const InterviewDetailPage = () => {
   className={`interviewer-tab ${interviewer === 'INM' ? 'active' : ''}`}
   onClick={() => setInterviewer('INM')}
 >
-  <img src={john} alt="Ravi " className="interviewer-avatar" />
-  <span>Ravi </span>
+  <img src={INM} alt="Deepak " className="interviewer-avatar" />
+  <span>Deepak </span>
 </button>
 
 <button
@@ -206,8 +208,8 @@ const InterviewDetailPage = () => {
   className={`interviewer-tab ${interviewer === 'INW' ? 'active' : ''}`}
   onClick={() => setInterviewer('INW')}
 >
-  <img src={jane} alt="Heera " className="interviewer-avatar" />
-  <span>Heera </span>
+  <img src={INW} alt="Deepika " className="interviewer-avatar" />
+  <span>Deepika </span>
 </button>
 
             </div>

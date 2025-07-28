@@ -12,7 +12,7 @@ import os
 import json
 import ast
 import nltk
-nltk.download()
+# nltk.download()
 # Setup
 # nltk.download('punkt', download_dir='./nltk_data')
 # nltk.download('stopwords')
@@ -43,7 +43,7 @@ def evaluate(data: Dict) -> Dict[str, float]:
     content_accuracy_score=round(avg(accuracy_scores), 2)
     overall_score=(round((grammar_score+filler_words_score+repetition_score+content_accuracy_score)/4))*10
     ai_advice,tips=generate_summary(grammar_score,filler_words_score,repetition_score,content_accuracy_score,overall_score)
-    # print(tips)
+    print(tips)
     # print(type(tips))
     return {
         "grammar_score": grammar_score*10,
