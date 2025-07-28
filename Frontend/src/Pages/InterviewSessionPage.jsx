@@ -5,6 +5,7 @@ import { speak, cancelSpeech } from '../utils/speechSynthesis';
 import { initializeRecognition } from '../utils/speechRecognition';
 import Loader from "../Components/Loader";
 import { Mic, MicOff } from 'lucide-react';
+import { fetchQuestionsAndAnswersFromAPI } from '../services/InterviewServices';
 
 const InterviewSessionPage = () => {
   const location = useLocation();
@@ -23,7 +24,6 @@ const InterviewSessionPage = () => {
   const apiCalledRef = useRef(false);
   const recognitionRef = useRef(null);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  
   // User and interview details
   const user = localStorage.getItem('user');
   const domain = interviewDetails?.domain;
@@ -182,49 +182,28 @@ const InterviewSessionPage = () => {
     
     init();
 
-    // Fetch questions and answers only once
-    const fetchQuestionsAndAnswers = async () => {
-      if (apiCalledRef.current) return;
-      apiCalledRef.current = true;
-      setLoading(true);
-      try {
-        const payload = {
-          domain,
-          techStack,
-          questionCount,
-          interviewMode,
-          interviewerName,
-          user,
-          interviewType
-        };
-        
-        const response = await fetch(`${backendUrl}/generate-qna`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          setQuestions(data.questions);
-          setAnswers(data.answers);
-          setCandidateAnswers(new Array(data.questions.length).fill(''));
-          setLoading(false);
-          
-          // Start with first question
-          if (data.questions.length > 0) {
-            askQuestion(data.questions[0]);
-          }
-        } else {
-          throw new Error('Failed to fetch interview questions');
-        }
-      } catch (err) {
-        setError(`Error fetching interview data: ${err.message}`);
-        setLoading(false);
-      }
+const fetchQuestionsAndAnswers = async () => {
+  if (apiCalledRef.current) return;
+  apiCalledRef.current = true;
+  setLoading(true);
+  const payload = {
+      domain,
+      techStack,
+      questionCount,
+      interviewMode,
+      interviewerName,
+      user,
+      interviewType
     };
+  const data = await fetchQuestionsAndAnswersFromAPI(payload, backendUrl);
+  setQuestions(data.questions);
+  setAnswers(data.answers);
+  setCandidateAnswers(new Array(data.questions.length).fill(''));
+  setLoading(false);
+  if (data.questions.length > 0)  askQuestion(data.questions[0]);
+};
     
-    fetchQuestionsAndAnswers();
+fetchQuestionsAndAnswers();
     
     return () => {
       stopRecording();
@@ -233,10 +212,10 @@ const InterviewSessionPage = () => {
   }, [interviewDetails]);
   
   // Get the appropriate video URL based on state
-  const getInterviewerVideo = () => {
-    const state = aiSpeaking ? 'speaking' : 'listening';
-    return `https://example.com/${state}.mp4`;
-  };
+  // const getInterviewerVideo = () => {
+  //   const state = aiSpeaking ? 'speaking' : 'listening';
+  //   return `https://example.com/${state}.mp4`;
+  // };
   
   // Render error state
   if (error) {
