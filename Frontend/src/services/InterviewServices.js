@@ -12,3 +12,5 @@ export async function fetchQuestionsAndAnswersFromAPI(payload, backendUrl) {
   const data = await response.json();
   return data;
 }
+
+
