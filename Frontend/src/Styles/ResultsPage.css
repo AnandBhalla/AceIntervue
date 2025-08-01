@@ -1,4 +1,3 @@
-
 .results-page {
   padding: 40px 0 60px;
 }
@@ -48,7 +47,6 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  --score: 85;
 }
 
 .score-circle::before {
@@ -73,6 +71,72 @@
   color: var(--text-gray);
   position: relative;
   z-index: 2;
+}
+
+/* Small score circles for individual metrics */
+.score-circle-small {
+  border-radius: 50%;
+  background: conic-gradient(
+    #4CAF50 0% calc(var(--score, 0) * 1%),
+    #e0e0e0 calc(var(--score, 0) * 1%) 100%
+  );
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin: 5px;
+}
+
+.score-circle-small::before {
+  content: '';
+  position: absolute;
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
+  border-radius: 50%;
+  background-color: var(--white);
+}
+
+.score-number-small {
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #333;
+  position: relative;
+  z-index: 2;
+}
+
+.score-label-small {
+  font-size: 0.6rem;
+  color: var(--text-gray);
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.scores-section {
+  padding: 15px 20px;
+  background-color: #f9f9f9;
+  border-top: 1px solid var(--light-gray);
+}
+
+.scores-section h4 {
+  margin: 0 0 10px 0;
+  color: var(--text-gray);
+  font-size: 0.9rem;
+}
+
+.scores-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 10px;
+  justify-items: center;
+}
+
+.ai-advice {
+  padding: 15px 20px;
+  background-color: #e3f2fd;
+  border-top: 1px solid var(--light-gray);
+  border-left: 4px solid var(--primary-blue);
 }
 
 .performance-graph {
@@ -260,5 +324,14 @@
   .interview-meta {
     flex-direction: column;
     gap: 10px;
+  }
+
+  .scores-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .score-circle-small {
+    width: 60px !important;
+    height: 60px !important;
   }
 }

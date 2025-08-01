@@ -1,174 +1,106 @@
-from typing import Dict, List
-from collections import Counter
-import re
-import requests
-# import nltk
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-from sentence_transformers import SentenceTransformer, util
-import google.generativeai as genai
-from dotenv import load_dotenv
 import os
-import json
 import ast
-import nltk
-# nltk.download()
-# Setup
-# nltk.download('punkt', download_dir='./nltk_data')
-# nltk.download('stopwords')
-# nltk.data.path.append('./nltk_data')
+import re
+import json
+import google.generativeai as genai
+from typing import Dict
 
-model = SentenceTransformer('all-MiniLM-L6-v2')
-FILLERS = {"um", "uh", "like", "you know", "so", "actually", "basically", "i mean", "well"}
+def clean_and_parse(s: str):
+    cleaned = re.sub(r"```(?:json)?\s*", "", s)
+    cleaned = re.sub(r"```", "", cleaned)
+    cleaned = cleaned.strip()
+    m = re.search(r"(\[ *\[\s*.*?\]\s*(,\s*\[.*?\]\s*)*\])", cleaned, re.DOTALL)
+    candidate = m.group(1) if m else cleaned
+    try:
+        return json.loads(candidate)
+    except:
+        return ast.literal_eval(candidate)
 
 def evaluate(data: Dict) -> Dict[str, float]:
-    questions = data["questions"]
-    answers = data["answers"]
-    candidate_answers = data["candidateAnswers"]
-
-    grammar_scores = []
-    filler_scores = []
-    repetition_scores = []
-    accuracy_scores = []
-
-    for ca, ref in zip(candidate_answers, answers):
-        grammar_scores.append(score_grammar(ca))
-        filler_scores.append(score_filler_words(ca))
-        repetition_scores.append(score_repetition(ca))
-        accuracy_scores.append(score_content_accuracy(ca, ref))
-
-    grammar_score=round(avg(grammar_scores), 2)
-    filler_words_score=round(avg(filler_scores), 2)
-    repetition_score=round(avg(repetition_scores), 2)
-    content_accuracy_score=round(avg(accuracy_scores), 2)
-    overall_score=(round((grammar_score+filler_words_score+repetition_score+content_accuracy_score)/4))*10
-    ai_advice,tips=generate_summary(grammar_score,filler_words_score,repetition_score,content_accuracy_score,overall_score)
-    print(tips)
-    # print(type(tips))
-    return {
-        "grammar_score": grammar_score*10,
-        "filler_words_score": filler_words_score*10,
-        "repetition_score": repetition_score*10,
-        "content_accuracy_score": content_accuracy_score*10,
-        "overall_score":overall_score,
-        "ai_advice":ai_advice,
-        "tips":tips,
-    }
-
-def avg(lst):
-    return sum(lst) / len(lst) if lst else 0
-
-# Grammar scoring using LanguageTool public API
-def score_grammar(text: str) -> float:
-    try:
-        res = requests.post(
-            "https://api.languagetool.org/v2/check",
-            data={"text": text, "language": "en-US"}
-        )
-        matches = res.json().get("matches", [])
-        error_count = len(matches)
-        word_count = len(text.split())
-
-        # print(error_count)
-        if word_count == 0:
-            return 10.0
-        errors_per_100 = (error_count / word_count) * 100
-        if errors_per_100 <= 2:
-            return 10
-        elif errors_per_100 <= 5:
-            return 8
-        elif errors_per_100 <= 10:
-            return 6
-        elif errors_per_100 <= 15:
-            return 4
-        else:
-            return 2
-    except Exception:
-        return 0  # fallback score on API failure
-
-
-
-
-# Filler word scoring
-def score_filler_words(text: str) -> float:
-    words = word_tokenize(text.lower())
-    filler_count = sum(1 for word in words if word in FILLERS)
-    ratio = filler_count / max(1, len(words))
-
-    if ratio <= 0.01:
-        return 10
-    elif ratio <= 0.03:
-        return 8
-    elif ratio <= 0.05:
-        return 6
-    elif ratio <= 0.08:
-        return 4
-    else:
-        return 2
-
-# Word repetition scoring
-def score_repetition(text: str) -> float:
-    words = word_tokenize(text.lower())
-    words = [w for w in words if w not in stopwords.words("english") and w.isalpha()]
-    word_freq = Counter(words)
-    repeated = sum(1 for count in word_freq.values() if count > 1)
-    ratio = repeated / max(1, len(words))
-
-    if ratio <= 0.03:
-        return 10
-    elif ratio <= 0.05:
-        return 8
-    elif ratio <= 0.08:
-        return 6
-    elif ratio <= 0.1:
-        return 4
-    else:
-        return 2
-
-# Semantic content similarity
-def score_content_accuracy(candidate: str, reference: str) -> float:
-    # if(candidate==""):   
-    #     return 0
-    embedding1 = model.encode(candidate, convert_to_tensor=True)
-    embedding2 = model.encode(reference, convert_to_tensor=True)
-    similarity = util.cos_sim(embedding1, embedding2).item()
-
-    if similarity > 0.9:
-        return 10
-    elif similarity > 0.75:
-        return 8
-    elif similarity > 0.6:
-        return 6
-    elif similarity > 0.4:
-        return 4
-    else:
-        return 2
-
-def generate_summary(grammar_score,filler_words_score,repetition_score,content_accuracy_score,overall_score):
+    answers = data.get("answers", [])
+    candidate_answers = data.get("candidateAnswers", [])
     api_key = os.getenv("GOOGLE_API_KEY")
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel('gemini-2.0-flash')
-    prompt = (
-        "You are given scores of an interview generate an advice based on that how to improve and what to work upon. If everything seems perfect praise the candidate."
-        f"grammar accuracy: {grammar_score}, filler words: {filler_words_score}, repetition of words: {repetition_score}, content accuracy: {content_accuracy_score}, overall score: {overall_score}"
-        "give 3 lines as a paragraph and 5 points of improvement starting with exact heading as :`tips`. followed by a json like list in format {'','',''...}"
-        "Do not include any additional text, commentary, or formatting like bold, italics, etc."
-    )
-    response = model.generate_content(prompt)
-    raw_text = response.candidates[0].content.parts[0].text
-    # cleaned = raw_text.strip().removeprefix("```json").removesuffix("```").strip()
-    tips = extract_tips(raw_text)
-    # print(tips)
-    return raw_text,tips
 
-def extract_tips(raw_text):
-    # Find the line starting with 'tips'
-    match = re.search(r"tips\s*:\s*(\{.*?\})", raw_text, re.DOTALL)
-    if match:
-        tips_str = match.group(1)
+    prompt = (
+        "You are an interview conversation analyser. "
+        "You will be provided with the expected answers and the candidate's answers. "
+        "Your task is to return a list of lists in the following format:\n"
+        "[[score_set_for_q1], [score_set_for_q2], ...]\n\n"
+        "Each inner list should contain scores for the corresponding question plus a short advice string. "
+        "All scores must be integers between 0 and 10, where 10 is best. "
+        "The sequence of judgement criteria for each question is strictly:\n"
+        "1. Accuracy (content matching)\n"
+        "2. Grammar\n"
+        "3. Repetition\n"
+        "4. Filler Words\n"
+        "5. moral_scores\n"
+        "6. Soft Skills\n\n"
+        "7th element of each inner list should be a brief AI advice string for that question.\n"
+        "Example: [[10,8,9,7,10,9,'Clarify your example'], [...], ...]\n\n"
+        f"Expected answers: {answers}\n"
+        f"Candidate answers: {candidate_answers}\n"
+        "Do not add any extra explanation; output exactly the list of lists."
+    )
+
+    response = model.generate_content(prompt)
+    raw_text = response.candidates[0].content.parts[0].text.strip()
+    per_q_scores = clean_and_parse(raw_text)
+    if not isinstance(per_q_scores, list):
+        per_q_scores = []
+
+    accuracy_scores = []
+    grammar_scores = []
+    repetition_scores = []
+    filler_scores = []
+    moral_scores = []
+    softskils_scores = []
+    question_advices = []
+    question_scores = []
+
+    def safe_int(x):
         try:
-            tips_list = ast.literal_eval(tips_str)
-            return list(tips_list)
-        except Exception as e:
-            print("Error parsing tips:", e)
-    return []
+            return int(x)
+        except:
+            return 0
+
+    for item in per_q_scores:
+        if not (isinstance(item, list) and len(item) >= 7):
+            continue
+        accuracy = safe_int(item[0])
+        grammar = safe_int(item[1])
+        repetition = safe_int(item[2])
+        filler = safe_int(item[3])
+        moral = safe_int(item[4])
+        soft = safe_int(item[5])
+        advice = str(item[6])
+
+        accuracy_scores.append(accuracy)
+        grammar_scores.append(grammar)
+        repetition_scores.append(repetition)
+        filler_scores.append(filler)
+        moral_scores.append(moral)
+        softskils_scores.append(soft)
+        question_advices.append(advice)
+
+        question_scores.append({
+            "accuracy": accuracy,
+            "grammar": grammar,
+            "repetition": repetition,
+            "filler_words": filler,
+            "moral_score": moral,
+            "soft_skill_score": soft,
+            "ai_suggestion": advice,
+        })
+
+    return {
+        "accuracy_scores": accuracy_scores,
+        "grammar_scores": grammar_scores,
+        "repetition_scores": repetition_scores,
+        "filler_scores": filler_scores,
+        "moral_scores": moral_scores,
+        "softskils_scores": softskils_scores,
+        "question_advices": question_advices,
+        "question_scores": question_scores,
+    }

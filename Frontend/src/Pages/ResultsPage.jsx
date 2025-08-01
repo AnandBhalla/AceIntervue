@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import '../Styles/ResultsPage.css';
@@ -9,7 +8,6 @@ const ResultsPage = () => {
   const interviewDetails = location.state?.interviewDetails;
   const evaluationReport = location.state?.evaluationReport;
   const qna = location.state?.qna;
-  // console.log(evaluationReport)
 
   if (!interviewDetails) {
     return (
@@ -23,41 +21,71 @@ const ResultsPage = () => {
     );
   }
 
-  // Mock data for interview results
-  const overall_score = evaluationReport?.overall_score
-  const grammar_score = evaluationReport?.grammar_score
-  const filler_words_score = evaluationReport?.filler_words_score
-  const repetition_score = evaluationReport?.repetition_score
-  const content_accuracy_score = evaluationReport?.content_accuracy_score
-  const ai_advice=evaluationReport?.ai_advice
-  const tips=evaluationReport?.tips
+  // Calculate average scores from arrays
+  const calculateAverage = (scores) => {
+    if (!scores || scores.length === 0) return 0;
+    return Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length * 10);
+  };
 
-  const questions=qna?.questions
-  const ai_answers=qna?.answers
-  const candidateAnswers=qna?.candidateAnswers
+  // Extract scores correctly from evaluation report
+  const accuracy_avg = calculateAverage(evaluationReport?.accuracy_scores);
+  const grammar_avg = calculateAverage(evaluationReport?.grammar_scores);
+  const repetition_avg = calculateAverage(evaluationReport?.repetition_scores);
+  const filler_avg = calculateAverage(evaluationReport?.filler_scores);
+  const moral_avg = calculateAverage(evaluationReport?.moral_scores);
+  const softskills_avg = calculateAverage(evaluationReport?.softskils_scores);
 
-  // console.log(overall_score)
+  // Calculate overall score
+  const overall_score = Math.round((accuracy_avg + grammar_avg + repetition_avg + filler_avg + moral_avg + softskills_avg) / 6);
+
+  const questions = qna?.questions || [];
+  const ai_answers = qna?.answers || [];
+  const candidateAnswers = qna?.candidateAnswers || [];
+
   const categories = [
-    { name: 'Technical Knowledge', score: content_accuracy_score },
-    { name: 'Communication', score: grammar_score },
-    { name: 'Confidence', score: filler_words_score},
-    { name: 'Content', score: repetition_score },
-    // { name: 'Problem Solving', score: 80 },
-    // { name: 'Culture Fit', score: 90 },
+    { name: 'Technical Knowledge', score: accuracy_avg },
+    { name: 'Communication', score: grammar_avg },
+    { name: 'Confidence', score: repetition_avg },
+    { name: 'Content Quality', score: filler_avg },
+    { name: 'Moral Score', score: moral_avg },
+    { name: 'Soft Skills', score: softskills_avg },
   ];
 
-  const evaluation=[];
+  // Build evaluation array with individual question scores
+  const evaluation = [];
+  const questionCount = Math.min(
+    questions.length, 
+    ai_answers.length, 
+    candidateAnswers.length,
+    evaluationReport?.question_scores?.length || 0
+  );
 
-  for(var i=0;i<interviewDetails.questionCount;i++){
+  for (let i = 0; i < questionCount; i++) {
+    const questionScore = evaluationReport?.question_scores?.[i];
     evaluation.push({
-      "question":questions[i],
-      "ai_answer":ai_answers[i],
-      "candidate_answer":candidateAnswers[i],
-    })
+      question: questions[i],
+      ai_answer: ai_answers[i],
+      candidate_answer: candidateAnswers[i],
+      accuracy: questionScore?.accuracy * 10 || 0,
+      grammar: questionScore?.grammar * 10 || 0,
+      repetition: questionScore?.repetition * 10 || 0,
+      filler: questionScore?.filler_words * 10 || 0,
+      moral: questionScore?.moral_score * 10 || 0,
+      softskills: questionScore?.soft_skill_score * 10 || 0,
+      ai_suggestion: questionScore?.ai_suggestion || ''
+    });
   }
 
-  console.log(tips)
-  const improvementTips = tips
+  // Extract improvement tips from question advices
+  const improvementTips = evaluationReport?.question_advices || [];
+
+  // Circle component for individual scores
+  const ScoreCircle = ({ score, label, size = 50 }) => (
+    <div className="score-circle-small" style={{ width: size, height: size }}>
+      <div className="score-number-small">{score}</div>
+      <div className="score-label-small">{label}</div>
+    </div>
+  );
 
   return (
     <div className="results-page">
@@ -72,7 +100,7 @@ const ResultsPage = () => {
 
         <div className="results-container">
           <div className="overall-score-section">
-            <div className="score-circle">
+            <div className="score-circle" style={{ '--score': overall_score }}>
               <div className="score-number">{overall_score}</div>
               <div className="score-label">Overall Score</div>
             </div>
@@ -96,15 +124,6 @@ const ResultsPage = () => {
             </div>
           </div>
 
-          <div className="insights-section">
-            <h2>Key Insights</h2>
-            <div className="insights-content">
-              <p>
-                {ai_advice}
-              </p>
-            </div>
-          </div>
-
           <div className="answers-analysis">
             <h2>Answer Analysis</h2>
             <div className="answers-list">
@@ -112,31 +131,50 @@ const ResultsPage = () => {
                 <div className="answer-item" key={index}>
                   <div className="answer-header">
                     <h3>Question {index + 1}</h3>
-                    <div className="answer-score" style={{ backgroundColor: getScoreColor(10) }}>
-                      {/* {answer.score}% */}
-                      00
-                    </div>
                   </div>
+                  
                   <div className="question-text">{details.question}</div>
+                  
                   <div className="analysis-text">
-                    <strong>Ai Answer:</strong> {details.ai_answer}
+                    <strong>AI Answer:</strong> {details.ai_answer}
                   </div>
+                  
                   <div className="analysis-text">
                     <strong>Your Answer:</strong> {details.candidate_answer}
                   </div>
+
+                  <div className="scores-section">
+                    <h4>Performance Metrics:</h4>
+                    <div className="scores-grid">
+                      <ScoreCircle score={details.accuracy} label="Accuracy" />
+                      <ScoreCircle score={details.grammar} label="Grammar" />
+                      <ScoreCircle score={details.repetition} label="Repetition" />
+                      <ScoreCircle score={details.filler} label="Filler" />
+                      <ScoreCircle score={details.moral} label="Moral" />
+                      <ScoreCircle score={details.softskills} label="Soft Skills" />
+                    </div>
+                  </div>
+
+                  {details.ai_suggestion && (
+                    <div className="ai-advice">
+                      <strong>AI Suggestion:</strong> {details.ai_suggestion}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="improvement-plan">
-            <h2>Improvement Plan</h2>
-            <ul className="improvement-list">
-              {improvementTips.map((tip, index) => (
-                <li key={index}>{tip}</li>
-              ))}
-            </ul>
-          </div>
+          {improvementTips.length > 0 && (
+            <div className="improvement-plan">
+              <h2>Improvement Plan</h2>
+              <ul className="improvement-list">
+                {improvementTips.map((tip, index) => (
+                  <li key={index}>{tip}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           <div className="results-actions">
             <button className="btn" onClick={() => navigate('/interview')}>
@@ -151,15 +189,6 @@ const ResultsPage = () => {
     </div>
   );
 };
-
-// Domain labels for display
-// const domains = {
-//   webdev: 'Web Development',
-//   datascience: 'Data Science',
-//   mobile: 'Mobile Development',
-//   devops: 'DevOps',
-//   pm: 'Product Management',
-// };
 
 // Helper function to get color based on score
 const getScoreColor = (score) => {
