@@ -13,7 +13,7 @@ async def evaluate_candidate(
 ):
     # Run evaluation logic
     result =  evaluate(data.dict())
-    print(result)
+    # print(result)
     # Insert full request data and result into the DB
     await db.interviews.insert_one({
         "questions": data.questions,

@@ -91,7 +91,7 @@ const averageScore = scores.length
             <table className="interviews-table">
               <thead>
                 <tr>
-                  <th>Date</th>
+                  {/* <th>Date</th> */}
                   <th>Domain</th>
                   <th className="hide-mobile">Technologies</th>
                   <th>Score</th>
@@ -101,7 +101,7 @@ const averageScore = scores.length
               <tbody>
                 {interviews.map((interview) => (
                   <tr key={interview.id}>
-                    <td>{new Date(interview.date).toLocaleDateString()}</td>
+                    {/* <td>{new Date(interview.date).toLocaleDateString()}</td> */}
                     <td>{interview.domain}</td>
                     <td className="hide-mobile">
                       <div className="tech-stack-tags">
